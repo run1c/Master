@@ -1,0 +1,15 @@
+Vss	CONN_SiPM-2 TP_HV-1 C_HV-1 LEMO_HV-1 
+unnamed_net11	CONN_APDPI-6 
+unnamed_net10	CONN_APDPI-5 
+unnamed_net9	CONN_APDPI-1 
+unnamed_net8	LEMO_OUT-1 R5-2 
+unnamed_net7	R5-1 C2-2 
+unnamed_net6	R0-2 CONN_SiPM-1 R1-1 
+unnamed_net5	U1-9 TP_Diff-1 C2-1 R4-2 
+unnamed_net4	U1-8 R4-1 R3-2 
+unnamed_net3	R3-1 C1-2 
+Vee	C4-1 CONN_APDPI-2 U1-4 
+Vcc	U1-6 C3-1 CONN_APDPI-3 U1-5 U1-10 
+unnamed_net2	TP_PreAmp-1 R2-2 C1-1 U1-1 
+unnamed_net1	R1-2 R2-1 U1-2 
+GND	U1-7 C4-2 C3-2 R0-1 C_HV-2 LEMO_HV-2 CONN_APDPI-4 LEMO_OUT-2 U1-3 

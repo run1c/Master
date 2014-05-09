@@ -1,0 +1,27 @@
+ULTIBOARD DRILL REPORT
+
+Design: MPPCC 
+
+DRILL FILE SETTINGS
+Excellon 2, Absolute, Inch, 2.5 
+
+
+DEFINITION COPPER LAYERS
+Copper Top
+Copper Inner 1
+Copper Inner 2
+Copper Bottom
+
+
+--------------------------------------------------------------------
+
+DRILLFILE                                           LAMINATION
+MPPCC Copper Top-Copper Bottom.drl   Copper Top .. Copper Bottom
+
+TOOL	SIZE		COUNT
+1	0.00984		94
+2	0.10630		5
+3	0.13833		2
+4	0.03500		32
+5	0.04331		17
+6	0.03150		3

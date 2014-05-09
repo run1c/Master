@@ -1,0 +1,135 @@
+               B I L L   O F   M A T E R I A L S							
+
+Project name: E:\ULTI_Prj\MPPC\MPPCC.UTSCH							
+Time & date:  15:28:52  13-May-2009							
+
+#		UT_DEVICE		UT_VALUE		UT_PKGTYPE	Refdes
+----------------------------------------------------------------------------------------------------------							
+
+1		ADCMP553		-		TSSOP8	U9
+1		LMH6715		LMH6715		SO8	U2
+1		LM358		LM358		SO8	U6
+1		DS18B20		DS18B20		TSSOP8	U4
+1		LMH6609		LMH6609		SO8	U5
+1		MAX144		MAX144BCUA		TSSOP8	U7
+1		MAX4224-ESA		MAX4224-ESA		SO8	U1
+1		MAX5532		MAX5533EUA		TSSOP8	U8
+1		MAX606X		MAX6061		SOT23-3	U3
+1		MPPC		-		TO18	D3
+2		NPN		BFR92A		TRA_SOT23	T4
+							T5
+1		NPN		BFN26		TRA_SOT23	T1
+1		PNP		BFN27		TRA_SOT23	T2
+1		DIODE		1N4148		D_MMELF	D1
+
+2		POT.METER_2		10K		TRPOT3269W	R39
+							R30
+1		RESISTOR		10		R0603	R5
+
+2		RESISTOR		22		R0603	R28
+							R29
+
+3		RESISTOR		47		R0603	R7
+							R8
+							R20
+
+2		RESISTOR		220		R0603	R21
+							R10
+
+3		RESISTOR		330		R0603	R2
+							R3
+							R38
+
+4		RESISTOR		1K2		R0603	R22
+							R23
+							R24
+							R25
+
+14		RESISTOR		1K		R0603	R35
+							R36
+							R26
+							R1
+							R15
+							R37
+							R27
+							R4
+							R19
+							R6
+							R9
+							R11
+							R33
+							R34
+
+1		RESISTOR		3K3		R0603	R18
+
+2		RESISTOR		4K7		R0603	R14
+							R13
+
+1		RESISTOR		10K		R0603	R47
+
+7		RESISTOR		0		R0403S	R40
+							R41
+							R42
+							R43
+							R44
+							R45
+							R46
+
+4		RESISTOR		100K		R0603	R16
+							R12
+							R31
+							R32
+
+1		RESISTOR		120K		R0603	R17
+
+
+1		CAPACITOR		20pF		C0603	C2
+26		CAPACITOR		100nF		C0603	C12
+							C23
+							C13
+							C3
+							C14
+							C4
+							C25
+							C15
+							C5
+							C26
+							C16
+							C6
+							C27
+							C17
+							C7
+							C28
+							C18
+							C8
+							C29
+							C19
+							C9
+							C20
+							C10
+							C21
+							C1
+							C22
+1		CAPACITOR		10nF		C0603	C24
+1		CAPACITOR		1nF		C0603	C11
+3		LEMO		BU_BNC5X5H		BU_BNC5X5H	J1
+							J2
+							J3
+4		CORE_COIL		1K			L1
+							L2
+							L3
+							L4
+1		TEST_PIN		s		SZ_M2_5	U10
+1		HDR_11		HDR_11		D9VF	J6
+1		HDR_9		HDR_9		SIL9	J4
+2		HDR_1		HDR_1		PIN	J5
+							J7
+2		HDR_7		HDR_7		SIL7	J13
+							J14
+5		HDR_1		HDR_1			J9
+							J10
+							J11
+							J12
+							J8
+
+Current processed Variant : DEFAULT							

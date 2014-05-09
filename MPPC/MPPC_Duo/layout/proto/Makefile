@@ -1,0 +1,14 @@
+FOOTPRINTS=~/EDA/Luciani_Footprints
+
+all:
+	gsch2pcb --use-files --elements-dir $(FOOTPRINTS) project 
+
+%.pcb: %.sch
+	gsch2pcb --use-files --elements-dir $(FOOTPRINTS) $^ 
+
+%.net: %.sch
+	gnetlist -g spice-sdb -o $@ $^
+
+clean: 
+	rm -f *.net
+	rm -f *.pcb*

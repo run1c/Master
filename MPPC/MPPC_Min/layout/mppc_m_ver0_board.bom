@@ -1,0 +1,24 @@
+# $Id$
+# PcbBOM Version 1.0
+# Date: Do  8 Mai 08:23:08 2014 UTC
+# Author: Runic
+# Title: (unknown) - PCB BOM
+# Quantity, Description, Value, RefDes
+# --------------------------------------------
+11,"0805","100nF",C11 C1 C10 C7 C9 C8 C13 C6 C5 C4 C12 
+2,"SIP6","unknown",CONN_FRONT2 CONN_FRONT 
+1,"TO92","unknown",U1 
+1,"SIP2","unknown",SiPM 
+6,"0805","10k",R4 R6 R7 R1 R3 R5 
+1,"1206","22nF/100V",C2 
+1,"CON_SMA__Amphenol_901-10112","unknown",LEMO_OUT 
+1,"0805","240",R10 
+2,"0805","62",R9 R11 
+2,"MSOP10","unknown",U4 U3 
+2,"HEADER6_2","unknown",CONN_ISP CONN_SLOW_CONTROL 
+1,"1206","100nF/100V",C3 
+1,"0805","120",R8 
+1,"0805","47",R12 
+1,"0805","1k",R2 
+1,"1206","unknown",D0 
+1,"SO14","unknown",U2 
