@@ -4,7 +4,7 @@
 	// EEPROM //
 	////////////
 
-#define MODULE_NO 0x13
+#define MODULE_NO 0x1F
 #ifndef MODULE_NO
 /* These are default values for calibration */
 // own address
