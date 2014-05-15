@@ -12,7 +12,7 @@
 #include <rs232/RWTH/SiPM/rs232_SiPM.h>
 #include <rs232/RWTH/SiPM/MPPC_D/MPPC_D.h>
 
-#define USB "/dev/ttyUSB0"
+#define USB "/dev/ttyUSB1"
 
 using namespace std;
 
@@ -29,7 +29,7 @@ int main(int argc, char** argv){
 	rs232_SiPM sipm(&usb, 9600);
 	MPPC_D fe(&sipm, 0x1F);
 
-	const int nTries = 10000;
+	const int nTries = 100;
 	double dummy = .0, ex_time[7], avg_ex_time[7];
 	string cmd_map[7] = {	"get Ubias_A",
 				"get Ubias_B",

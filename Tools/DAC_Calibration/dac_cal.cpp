@@ -1,7 +1,8 @@
-#include <stdio.h>
 #include <fstream>
+#include <stdio.h>
 #include <sstream>
 #include <math.h>
+#include <iomanip> 	// setprecision
 
 // unix
 #include <unistd.h>
@@ -62,7 +63,7 @@ int main(int argc, char** argv){
 		}
 	}
 
-	printf("[DAC cal] - Setup: FE addr 0x%02X SiPM %c; DAC %i-%i in %i steps with %i measurements.\n", fe_addr, 'A', start_DAC, stop_DAC, nSteps, nMeas);
+	printf("[DAC cal] - Setup: FE addr 0x%02X SiPM %c; DAC %i-%i in %i steps with %i measurements.\n", fe_addr, 'B', start_DAC, stop_DAC, nSteps, nMeas);
 
 	/* MPPC_D setup */
 
@@ -80,7 +81,7 @@ int main(int argc, char** argv){
 	apdpi.read_value(fe_addr, "Q");	
 	printf("[DAC Cal] - Set MPPC_D to calibration mode.\n"); 
 	if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(0);
-	if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_A(0);
+	if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(0);
 	printf("[DAC Cal] - Set DAC to 0.\n"); 
 
 	/* sourcemeter setup */
@@ -153,8 +154,8 @@ int main(int argc, char** argv){
 
 		cur_DAC = start_DAC + DAC_per_step*iStep;
 		if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(cur_DAC*0.001);
-		if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_A(cur_DAC*0.001);
-		printf("[DAC Cal] - DAC %i\t", cur_DAC);
+		if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(cur_DAC*0.001);
+		printf("[DAC Cal] - DAC %i\r", cur_DAC);
 
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
 			// voltage in mV
@@ -162,6 +163,7 @@ int main(int argc, char** argv){
 			mean_voltage += voltage;
 			mean_voltage2 += pow(voltage, 2);
 			out_tree->Fill();
+			cout << "\t\t\t\t... " << setprecision(3) << (float)iMeas/(float)nMeas*100. << "%\r" << flush;
 		}
 
 		// calculate mean, mean² and sigma
@@ -169,7 +171,7 @@ int main(int argc, char** argv){
 		mean_voltage2 /= nMeas;
 		voltage_err = sqrt( mean_voltage2 - pow(mean_voltage, 2) );
 		
-		printf("(%5.2f+-%5.2f)mV\n", mean_voltage, voltage_err);
+		printf("\t\t\t(%5.2f+-%5.2f)mV\n", mean_voltage, voltage_err);
 
 		// fill data into graph (voltage in mV and DAC to real DAC counts)
 		cal_gr->SetPoint(iStep, (double)cur_DAC, mean_voltage);

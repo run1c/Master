@@ -1,0 +1,5 @@
+# DAC calibration 0x1f SiPM A #
+DAC gain	1.24437
+DAC gain err	0.000506321
+DAC offset	1737.76
+DAC offset err	27.8477
