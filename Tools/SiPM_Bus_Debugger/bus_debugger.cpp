@@ -12,7 +12,7 @@
 #include <rs232/RWTH/SiPM/rs232_SiPM.h>
 #include <rs232/RWTH/SiPM/MPPC_D/MPPC_D.h>
 
-#define USB "/dev/ttyUSB1"
+#define USB "/dev/ttyUSB0"
 
 using namespace std;
 

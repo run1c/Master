@@ -3,6 +3,7 @@
 #include <math.h>
 #include <sstream>
 #include <fstream>
+#include <ctime>
 
 // liblab
 #include <rs232/linux_rs232.h>
@@ -49,6 +50,8 @@ int main(int argc, char** argv){
 	      mean_adc2 = .0,
 	      adc_err = .0;
 	char input = 'X';
+	unsigned long int time0 = time(0), cur_time;	// seconds since 01 Jan 1970 (UNIX time)
+	int timestamp;
 
 	/* init output - root stuff */
 	sName << "TempCal_mod0x" << hex << fe_addr << ".root";
@@ -58,6 +61,7 @@ int main(int argc, char** argv){
 	out_tree->Branch("adc_count", &adc_count);
 	out_tree->Branch("nMeas", &nMeas);
 	out_tree->Branch("nSteps", &nSteps);
+	out_tree->Branch("timestamp", &timestamp);
 
 	sName.str("");
 	sName << "TempCal_mod0x" << hex << fe_addr << ".txt";
@@ -81,6 +85,8 @@ int main(int argc, char** argv){
 		// take measurements
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
 			adc_count = fe.get_temperature_raw();
+			cur_time = time(0);
+			timestamp = cur_time - time0;
 			out_tree->Fill();
 			cout << (float)iMeas/(float)nMeas*100. << "%\r" << flush;				
 			mean_adc += adc_count;	
