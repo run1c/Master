@@ -12,7 +12,7 @@ LIBLAB=$(HOME)/liblab/
 CFLAGS=-Wall $(ROOTCFLAGS) -I$(LIBLAB) 
 LDFLAGS=-L$(LIBLAB) $(ROOTGLIBS) -llab
 
-all: $(BIN)
+all: $(BIN) gain_analysis
 
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $^
@@ -20,6 +20,10 @@ all: $(BIN)
 $(BIN): $(BIN).o $(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
+%: %.o $(OBJ)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
 clean:
 	rm -f *.o
 	rm -f $(BIN)
+	rm -f gain_analysis

@@ -1,2 +1,4 @@
 gain_meas
+gain_analysis
 *.root
+*.jpg
