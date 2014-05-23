@@ -16,20 +16,27 @@
 #include <TF1.h>
 #include <TGraphErrors.h>
 
-#define SIPM_COM "/dev/ttyUSB0"
+#define SIPM_COM "/dev/ttyUSB1"
 
 using namespace std;
 
 int main(int argc, char** argv){
 	uint16_t fe_addr = 0xFF;
 	stringstream ssBuf, sName;
+	int nSteps, nMeas;
+	float tStart, tStop;
 
-	if (argc != 2){
-		printf("Usage: ./temperature_cal <fe address>\n");
+	if (argc != 6){
+		printf("Usage: ./temperature_cal <fe address> <start temperature> <stop temperature> <no points> <no measurements per point>\n");
+		printf("\te.g.: ./temperature_cal 1F 0 25 10 1000\n");
 		return -1;
 	} else {
 		ssBuf << argv[1];
 		ssBuf >> hex >> fe_addr;
+		tStart = atof(argv[2]);
+		tStop = atof(argv[3]);
+		nSteps = atoi(argv[4]);
+		nMeas = atoi(argv[5]);
 	}
 	
 
@@ -41,10 +48,8 @@ int main(int argc, char** argv){
 
 	printf("[Temp Cal] - Calibration for controller 0x%02X.\n", fe_addr);
 
-	int nSteps = 5, nMeas = 10;
 	float cur_temp = 0.,
-	      temp_per_step = 10.,
-	      offset = -10.;
+	      temp_per_step = (tStop - tStart)/(float)nSteps;
 	uint16_t adc_count = 0;		// 10 bit adc register
 	float mean_adc = .0,
 	      mean_adc2 = .0,
@@ -73,7 +78,7 @@ int main(int argc, char** argv){
 	for (int iStep = 0; iStep < nSteps; iStep++){
 		mean_adc = 0.;
 		mean_adc2 = 0.;
-		cur_temp = offset + temp_per_step*iStep; 
+		cur_temp = tStart + temp_per_step*iStep; 
 		printf("[Temp Cal] - Set temperature to %2.1f deg C and press enter...\n", cur_temp);
 
 		// wait for input from stdin

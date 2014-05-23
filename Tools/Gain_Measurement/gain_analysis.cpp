@@ -3,6 +3,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 // root
 #include <TSystem.h>
 #include <TTree.h>
@@ -37,8 +38,11 @@ int main(int argc, char** argv){
 
 	stringstream ssbuf;
 	int nSamples = tree->GetEntries();
-	float pulse_height, mean = 0, sigma, width = 0.01, min_height;
-	float mean_err, sigma_err;
+	float pulse_height, width = 0.01, min_height;
+	float* mean = new float[nMax];
+	float* sigma = new float[nMax];
+	float* mean_err = new float[nMax];
+	float* sigma_err = new float[nMax];
 	tree->SetBranchAddress("pulse_height", &pulse_height);
 
 	// look at fingerspectrum from 0 to 100mV
@@ -59,15 +63,15 @@ int main(int argc, char** argv){
 		
 		
 		// set preleminary parameters to improve fit results
-		mean = h_spec->GetBinCenter( h_spec->GetMaximumBin() );
+		mean[iMax] = h_spec->GetBinCenter( h_spec->GetMaximumBin() );
 		gaus_fit->SetParameter(0, h_spec->GetBinContent(h_spec->GetMaximumBin()));
-		gaus_fit->SetParameter(1, mean); 
+		gaus_fit->SetParameter(1, mean[iMax]); 
 		gaus_fit->SetParameter(2, width);
 
-		printf("[Gain Analysis] - Fit%i [%.3f, %.3f] :", iMax, mean-2.*width, mean+2.*width);
+		printf("[Gain Analysis] - Fit%i [%.3f, %.3f] :", iMax, mean[iMax]-2.*width, mean[iMax]+2.*width);
 
 		// fit a gauss to the peak
-		h_spec->Fit(gaus_fit, "Q", "", mean - 2.*width, mean + 2.*width);
+		h_spec->Fit(gaus_fit, "Q", "", mean[iMax] - 2.*width, mean[iMax] + 2.*width);
 		h_spec->Draw();
 
 		// truncate filename "file.root" to "file"
@@ -75,21 +79,30 @@ int main(int argc, char** argv){
 		sbuf = file_name;
 		sbuf = sbuf.substr(0, sbuf.find(".root"));
 		ssbuf.str("");
-		ssbuf << "fit" << (iMax+1) << "_" << sbuf.c_str() << ".jpg";
+		ssbuf << sbuf.c_str() << "fit" << (iMax+1) << "_" << ".jpg";
 		// save image
 		c1->SaveAs(ssbuf.str().c_str());
 		// get parameters
-		mean = gaus_fit->GetParameter(1);
-		mean_err = gaus_fit->GetParError(1);
-		sigma = gaus_fit->GetParameter(2);
-		sigma_err = gaus_fit->GetParError(2);
+		mean[iMax] = gaus_fit->GetParameter(1);
+		mean_err[iMax] = gaus_fit->GetParError(1);
+		sigma[iMax] = gaus_fit->GetParameter(2);
+		sigma_err[iMax] = gaus_fit->GetParError(2);
 
-		printf(" mean=(%.3f+-%.3f)mV, sigma=(%.3f+-%.3f)mV\n", 1000.*mean, 1000.*mean_err, 1000.*sigma, 1000.*sigma_err);
+		printf(" mean=(%.3f+-%.3f)mV, sigma=(%.3f+-%.3f)mV\n", 1000.*mean[iMax], 1000.*mean_err[iMax], 1000.*sigma[iMax], 1000.*sigma_err[iMax]);
 
 		// exclude first peak for next fit
-		min_height = mean + width;
+		min_height = mean[iMax] + width;
 	}
 
+	// calculate gain as distance of the maxima
+	float* gain = new float[nMax-1];
+	float* gain_err = new float[nMax-1];
+	for (int i = 0; i < (nMax-1); i++){
+		gain[i] = mean[i + 1] - mean[i];
+		gain_err[i] = sqrt( pow(mean_err[i], 2) + pow(mean_err[i + 1], 2) );
+		printf("[Gain Analysis] - Measured gain (%f-+%f)mV\n", 1000.*gain[i], 1000.*gain_err[i]);
+	}
+		
 	// cleanup
 	file->Close();
 	return 0;

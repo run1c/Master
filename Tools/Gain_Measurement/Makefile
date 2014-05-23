@@ -1,4 +1,5 @@
 BIN=gain_meas
+BIN2=gain_analysis
 OBJ=
 CC=g++
 
@@ -12,7 +13,7 @@ LIBLAB=$(HOME)/liblab/
 CFLAGS=-Wall $(ROOTCFLAGS) -I$(LIBLAB) 
 LDFLAGS=-L$(LIBLAB) $(ROOTGLIBS) -llab
 
-all: $(BIN) gain_analysis
+all: $(BIN) $(BIN2)
 
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $^
@@ -20,7 +21,7 @@ all: $(BIN) gain_analysis
 $(BIN): $(BIN).o $(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
-%: %.o $(OBJ)
+$(BIN2): $(BIN2).o $(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
 clean:
