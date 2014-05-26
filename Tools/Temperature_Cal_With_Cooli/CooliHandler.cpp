@@ -5,11 +5,11 @@ using namespace std;
 
 CooliHandler::CooliHandler(){
 	subsys.setid("Client");
-	subsys.supply("/cooli/control");
+	subsys.supply("/cooli2/control");
 }
 
 CooliHandler::~CooliHandler(){
-	subsys.unsupply("/cooli/control");
+	subsys.unsupply("/cooli2/control");
 	subsys.terminate();
 }
 
@@ -19,12 +19,12 @@ struct CooliHandler::cooliMessage CooliHandler::get_status_message(){
 	poll_fd[0].fd = subsys.getfd();
 	
 	packet_t packet;
-	subsys.subscribe("/cooli/status");
+	subsys.subscribe("/cooli2/status");
 	while(true){
 		if(poll(poll_fd,1,100)>0){	// 100 -> reviece_timeout
 			subsys.recvpacket(packet);
 			cooliMessage lastMessage = formatMessage(packet);
-			subsys.unsubscribe("/cooli/status");
+			subsys.unsubscribe("/cooli2/status");
 			return lastMessage;
 		}
 	}
@@ -53,7 +53,7 @@ int CooliHandler::setTemperature(string nominalTemperature){
 				return 0;
 			} else {
 				string setTempCommand = "NOMINAL_TEMPERATURE "+nominalTemperature+"\n";
-				subsys.aprintf("/cooli/control", setTempCommand.c_str());
+				subsys.aprintf("/cooli2/control", setTempCommand.c_str());
 				sleep(10);
 			}
 		}
