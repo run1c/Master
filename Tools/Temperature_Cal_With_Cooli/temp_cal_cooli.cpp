@@ -16,6 +16,8 @@
 #include <TF1.h>
 #include <TGraphErrors.h>
 
+#include "CooliHandler.h"
+
 #define SIPM_COM "/dev/ttyUSB0"
 
 using namespace std;
@@ -54,7 +56,7 @@ int main(int argc, char** argv){
 	double mean_adc = .0,
 	      mean_adc2 = .0,
 	      adc_err = .0;
-	char input = 'X';
+	stringstream ssbuf;
 	unsigned long int time0 = time(0), cur_time;	// seconds since 01 Jan 1970 (UNIX time)
 	int timestamp;
 
@@ -75,17 +77,22 @@ int main(int argc, char** argv){
 	TGraphErrors* cal_gr = new TGraphErrors();
 	TF1* cal_fit = new TF1("cal_fit", "[0] + [1]*x");
 
+	CooliHandler cooli;
+
 	for (int iStep = 0; iStep < nSteps; iStep++){
 		mean_adc = 0.;
 		mean_adc2 = 0.;
-		cur_temp = tStart + temp_per_step*iStep; 
-		printf("[Temp Cal] - Set temperature to %2.1f deg C and press enter...\n", cur_temp);
+		cur_temp = tStart + temp_per_step*iStep;
+		ssbuf << cur_temp;  
+		printf("[Temp Cal] - Setting temperature to %s deg C...\n", ssbuf.str().c_str());
 
-		// wait for input from stdin
-		while ( true ) {
-			input = getc(stdin);
-			if (input == '\n') break;
-		}
+		// set temperature
+		cooli.setTemperature(ssbuf.str());
+		// wait for setting...
+		while (!cooli.isReady(ssbuf.str())){ 
+			printf("[Temp Cal] - Waiting for cooli to @%.2fdegC/%sdegC ...\n", cooli.getTemperature(), ssbuf.str().c_str());
+			sleep(60); 
+		};
 	
 		// take measurements
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){

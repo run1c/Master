@@ -20,8 +20,8 @@
 #include <TGraphErrors.h>
 #include <TF1.h>
 
-#define SIPM_COM "/dev/ttyUSB0"
-#define KEITHLEY_COM "/dev/ttyUSB1"
+#define SIPM_COM "/dev/ttyUSB1"
+#define KEITHLEY_COM "/dev/ttyUSB2"
 
 using namespace std;
 
@@ -50,7 +50,7 @@ int main(int argc, char** argv){
 		if (argc == 3) {	// default setup
 			start_DAC = 0;
 			stop_DAC = 60000;
-			nSteps = 10;
+			nSteps = 100;
 			nMeas = 3;	
 		} else if (argc < 7) {
 			print_usage();
