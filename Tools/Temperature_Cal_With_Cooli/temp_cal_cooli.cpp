@@ -94,7 +94,7 @@ int main(int argc, char** argv){
 		cooli.setTemperature(ssbuf.str());
 		// wait for setting...
 		while (!cooli.isReady(ssbuf.str())){ 
-			printf("[Temp Cal] - Waiting for cooli to @%.2fdegC/%sdegC ...\n", cooli.getTemperature(), ssbuf.str().c_str());
+			printf("[Temp Cal] - Waiting for cooli to set %sdegC (cooli@%.2f/fe@%.2f)\n", ssbuf.str().c_str(), cooli.getTemperature(), fe.get_temperature());
 			sleep(60); 
 		};
 	

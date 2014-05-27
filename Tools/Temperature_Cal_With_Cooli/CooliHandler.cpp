@@ -61,9 +61,10 @@ int CooliHandler::setTemperature(string nominalTemperature){
 }
 
 double CooliHandler::getTemperature(){
-	cooliMessage tempCM = get_status_message();
+	cooliMessage tempCM;
 	double ret_val;
 	while (true){
+		tempCM = get_status_message();
 		if (tempCM.command == "RegulatedTemperature"){
 			ret_val = strtod(tempCM.value.c_str(), NULL);
 			break;

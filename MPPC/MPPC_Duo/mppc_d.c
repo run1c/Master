@@ -102,8 +102,8 @@ float eeDACGainA EEMEM = 1.27568f;
 float eeDACGainB EEMEM = 1.28753f;
 float eeDACOffA EEMEM = 66;
 float eeDACOffB EEMEM = -666;
-float eeTGain EEMEM = 0.09142f;
-float eeTOff EEMEM = -41.35;
+float eeTGain EEMEM = 0.099601f;
+float eeTOff EEMEM = -45.129;
 #endif
 
 	//////////
