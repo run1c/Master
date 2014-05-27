@@ -51,6 +51,8 @@ int main(int argc, char** argv){
 	printf("[Temp Cal] - Calibration for controller 0x%02X.\n", fe_addr);
 
 	float cur_temp = 0.,
+	      pt100_temp = .0,
+	      cooli_temp = .0,
 	      temp_per_step = (tStop - tStart)/(float)nSteps;
 	uint16_t adc_count = 0;		// 10 bit adc register
 	double mean_adc = .0,
@@ -65,6 +67,8 @@ int main(int argc, char** argv){
 	TFile* out_file = new TFile(sName.str().c_str(), "RECREATE");
 	TTree* out_tree = new TTree("temp_cal", "temp_cal");
 	out_tree->Branch("temperature", &cur_temp);
+	out_tree->Branch("cooli_temp",&cooli_temp);
+	out_tree->Branch("pt100_temp",&pt100_temp);
 	out_tree->Branch("adc_count", &adc_count);
 	out_tree->Branch("nMeas", &nMeas);
 	out_tree->Branch("nSteps", &nSteps);
@@ -96,7 +100,11 @@ int main(int argc, char** argv){
 	
 		// take measurements
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
+			// get ALL the temperatures
 			adc_count = fe.get_temperature_raw();
+			pt100_temp = fe.get_temperature();
+			cooli_temp = cooli.getTemperature();
+
 			cur_time = time(0);
 			timestamp = cur_time - time0;
 			out_tree->Fill();

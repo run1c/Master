@@ -127,6 +127,8 @@ int main(int argc, char** argv){
 	out_tree->Branch("DAC_counts", &cur_DAC);
 	out_tree->Branch("n_measurements", &nMeas);
 	out_tree->Branch("n_steps", &nSteps);
+	out_tree->Branch("mean_voltage", &mean_voltage);
+	out_tree->Branch("mean_voltage_err", &voltage_err);
 
 	TGraphErrors* cal_gr = new TGraphErrors();
 	cal_gr->SetTitle(";DAC counts;U[mV]");

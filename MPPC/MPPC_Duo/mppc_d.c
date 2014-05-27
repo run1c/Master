@@ -93,17 +93,17 @@ float eeTGain EEMEM = 0.0991f;
 float eeTOff EEMEM = -49.14f;
 #elif MODULE_NO == 0x1F
 uint8_t eeAddress EEMEM	= 0x1F;
-uint8_t eeVcoef EEMEM = 56;
+uint8_t eeVcoef EEMEM = 57;
 uint32_t eeVopA EEMEM = 67290;
-uint32_t eeVopB EEMEM = 71950;
-char eeSerNoA[9] EEMEM = "00000000\0";
-char eeSerNoB[9] EEMEM = "00000000\0"; 
-float eeDACGainA EEMEM = 1.273f;
-float eeDACGainB EEMEM = 1.278f;
-float eeDACOffA EEMEM = 78;
-float eeDACOffB EEMEM = 34;
-float eeTGain EEMEM = 0.0732f;
-float eeTOff EEMEM = -30.f;
+uint32_t eeVopB EEMEM = 67290;
+char eeSerNoA[9] EEMEM = "3H000004\0";
+char eeSerNoB[9] EEMEM = "3H000004\0"; 
+float eeDACGainA EEMEM = 1.27568f;
+float eeDACGainB EEMEM = 1.28753f;
+float eeDACOffA EEMEM = 66;
+float eeDACOffB EEMEM = -666;
+float eeTGain EEMEM = 0.09142f;
+float eeTOff EEMEM = -41.35;
 #endif
 
 	//////////
