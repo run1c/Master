@@ -20,8 +20,8 @@
 
 #define SIPM_COM "/dev/ttyUSB2"
 
-// do not use cooli controls!
-#define DEBUG
+// define to not use cooli controls!
+//#define DEBUG
 
 using namespace std;
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv){
 		cur_temp = tStart + temp_per_step*iStep;
 		ssbuf.str("");
 		ssbuf << cur_temp;  
-		printf("[Temp Cal] - Setting temperature to %s deg C...\n", ssbuf.str().c_str());
+		printf("[Temp Cal] - Setting temperature to %s degC...\n", ssbuf.str().c_str());
 
 		// set temperature
 	#ifndef DEBUG
@@ -105,12 +105,19 @@ int main(int argc, char** argv){
 	#endif
 		// take measurements
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
+		#ifndef DEBUG
+			// retry if cooli is not stable
+			if ( !cooli.isReady( ssbuf.str() ) ){
+				iMeas--;
+				printf("[Temp Cal] - Waiting to stabilize again.\n");
+				continue;
+			}
+			cooli_temp = cooli.getTemperature();
+		#endif
 			// get ALL the temperatures
 			adc_count = fe.get_temperature_raw();
 			pt100_temp = fe.get_temperature();
-		#ifndef DEBUG
-			cooli_temp = cooli.getTemperature();
-		#endif
+		
 			cur_time = time(0);
 			timestamp = cur_time - time0;
 			out_tree->Fill();
