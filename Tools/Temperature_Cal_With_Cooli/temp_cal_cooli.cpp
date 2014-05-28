@@ -18,7 +18,10 @@
 
 #include "CooliHandler.h"
 
-#define SIPM_COM "/dev/ttyUSB0"
+#define SIPM_COM "/dev/ttyUSB2"
+
+// do not use cooli controls!
+#define DEBUG
 
 using namespace std;
 
@@ -92,20 +95,22 @@ int main(int argc, char** argv){
 		printf("[Temp Cal] - Setting temperature to %s deg C...\n", ssbuf.str().c_str());
 
 		// set temperature
+	#ifndef DEBUG
 		cooli.setTemperature(ssbuf.str());
 		// wait for setting...
 		while (!cooli.isReady(ssbuf.str())){ 
 			printf("[Temp Cal] - Waiting for cooli to set %sdegC (cooli@%.2f/fe@%.2f)\n", ssbuf.str().c_str(), cooli.getTemperature(), fe.get_temperature());
 			sleep(60); 
-		};
-	
+		};	
+	#endif
 		// take measurements
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
 			// get ALL the temperatures
 			adc_count = fe.get_temperature_raw();
 			pt100_temp = fe.get_temperature();
+		#ifndef DEBUG
 			cooli_temp = cooli.getTemperature();
-
+		#endif
 			cur_time = time(0);
 			timestamp = cur_time - time0;
 			out_tree->Fill();
