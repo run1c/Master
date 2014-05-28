@@ -87,6 +87,7 @@ int main(int argc, char** argv){
 		mean_adc = 0.;
 		mean_adc2 = 0.;
 		cur_temp = tStart + temp_per_step*iStep;
+		ssbuf.str("");
 		ssbuf << cur_temp;  
 		printf("[Temp Cal] - Setting temperature to %s deg C...\n", ssbuf.str().c_str());
 
