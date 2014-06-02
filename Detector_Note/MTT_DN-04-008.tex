@@ -2,7 +2,7 @@
 \begin{document}
 	\section{APDPI}
 
-The Avalanche Photodiode Power Interface APDPI is a standart NIM module that supplies power for the SiPMs, amplifier circuits and logic of the frontend electronics.
+The Avalanche Photodiode Power Interface APDPI is a standard NIM module that supplies power for the SiPMs, amplifier circuits and logic of the frontend electronics.
 Figure [\ref{APDPI_front}] shows the front panel of an APDPI module: On the top there is a DSUB-9 connector consisting of a VBIAS, V+, V-, GND, RTX+ and RTX- output.
 Below the connector there are two switches BIAS and POWER and again below that a USB B plug.
 
@@ -15,13 +15,16 @@ Below the connector there are two switches BIAS and POWER and again below that a
 			\item V+ and V- supply a $\pm3.3\,V@1A$ power source respectively for the amplifier and logic circuits of the frontend electronics. There are two voltage regulators 
 			which use the $\pm6\,V$ lines of the NIM backend to generate the $\pm3.3\,V$ outputs. Below the BIAS switch there is also a POWER switch located for V+ and V-.
 
-			\item GND is the reference potential for VBIAS as well as for V+ and V-. Is uses the ground line of the NIM backend and is also connected to the casing to reduce noise.
+			\item GND is the reference potential for VBIAS as well as for V+ and V-. It uses the ground line of the NIM backend and is also connected to the casing of the module to reduce noise.
 
-			\item RTX+ and RTX- are the differential EIA-485 compliant outputs used for communication with and slow control of the frontend electronics. The EIA-485 or RS-485 defines a 
-				physical layer that uses a differential signal for communcation thus providing a stable signal over distances of up to $1.2\,km$. The data link layer is 
-			compliant to microcontroller friendly USART which simplifies the whole commucation chain in hardware. For more details on RS-485 see [\ref{wiki_eia485}]. A 
-			computer can be connected to the APDPI via a USB B plug located beneath the POWER switch. The USB signal is mapped to USART by a \emph{FT232RL} chip [\ref{ftdi_datasheet}] 
+			\item RTX+ and RTX- are the differential EIA-485 compliant outputs used for communication with and slow control of the frontend electronics. The EIA-485 (or RS-485) defines a 
+			physical layer that uses a differential signal for communcation thus providing a stable signal over distances of up to $1.2\,km$. The data link layer is 
+			compliant to the microcontroller friendly Universal Synchronous/Asynchronous Receiver Transmitter (USART) which simplifies the whole commucation chain in hardware. 
+			For more details on RS-485 see [\ref{wiki_eia485}].
+			A computer can be connected to the APDPI via a USB B plug located beneath the POWER switch. The USB signal is mapped to USART by a \emph{FT232RL} chip [\ref{ftdi_datasheet}] 
 			and again converted to RS-485 by a \emph{MAX3086E} chip [\ref{max3086e_datasheet}] thus the slow control can be accessed with a simple FTDI serial driver [\ref{ftdi_ser_driver}].
+			The \emph{MAX3086E} transceiver provides a half duplex communication interface meaning that the driver uses the same data lines to transmit and receive data, but it cannot
+			do both at the same time.
 		
 		\end{enumerate}
 
@@ -41,11 +44,16 @@ no parity bit, one stop bit to maximize data throughput.
 	\newpage
 	\section{MPPC Dou Controller}
 
-The Multi Pixel Photon Counter Duo Controller MPPC D is the current frontend electronics prototype for the MTT project. It features regulated bias voltages for up to two SiPMs, a PT100 based temperature
-probe, one LEMO output for each single SiPM and a sum channel LEMO output. 
+The Multi Pixel Photon Counter Duo Controller (MPPC D) is the current frontend electronics prototype for the MTT project. It features regulated bias voltages for up to two SiPMs, a PT100 based temperature
+probe, one LEMO output for each single SiPM and a sum channel LEMO output.
 
+The core part of the MPPC D is an \emph{ATmega88P} [\ref{atmega88pa_datasheet}]. The \emph{ATmega88P} is an 8 bit microcontroller designed for very low power consumption, features a USART interface,
+10 bit DACs, a Serial Peripheral Interface (SPI) [\ref{spi_info}], $512\,B$ of EEPROM and is run with an $1\,MHz$ internal system clock to minimize power consumption. Figure [\ref{mppc_top}] shows a picture
+of all functional units 
 	\subsection{Temperature Measurement}
+		\subsubsection{Temperature Probe Calibration}
 	\subsection{Bias Voltage Supply}
+		\subsubsection{Bias Voltage Regulator Calibration}
 	\subsection{Amplifier Circuits}
 	\subsection{Overview Of Technical Characteristics}
 

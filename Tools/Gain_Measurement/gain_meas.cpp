@@ -16,6 +16,8 @@
 
 using namespace std;
 
+//#define VERBOSE
+
 // determines the baseline by fitting a line to the first n points of the histo
 // slope and offset determine the quality of the fit
 // (slope ~= 0, offset ~= 0)
@@ -56,9 +58,9 @@ int main(int argc, char** argv){
 	printf("[Gain Measurement] - Setting up output files..\n");
 
 	// to be saved by root
-	Float_t t[sample_len], u[sample_len];
+	double t[sample_len], u[sample_len];
 	Int_t len;
-	Float_t baseline, pulse_height, slope, offset;
+	float baseline, pulse_height, slope, offset;
 	// root stuff
 	TFile* out_file = new TFile(argv[2], "RECREATE");
 	TH1F* h_pulse = new TH1F("h_pulse", "h_pulse", sample_len+1, t_min, t_max);
@@ -91,12 +93,14 @@ int main(int argc, char** argv){
 			continue;
 		}
 		// everything seems to be fine
-		pulse_height = h_pulse->GetBinContent(h_pulse->GetMaximumBin()) - baseline;
+		pulse_height = h_pulse->GetBinContent( h_pulse->GetMaximumBin() ) - baseline;
 		iSample++;
 
 		// save
 		out_tree->Fill();
 #ifdef VERBOSE
+		printf("[Gain Measurement] - baseline = %fV\n", baseline);
+		printf("[Gain Measurement] - pulse height = %fV\n", pulse_height);
 		h_pulse->Write();
 #endif
 	}
@@ -108,17 +112,17 @@ int main(int argc, char** argv){
 }
 
 float getBaseline(TH1F* histo, float start, float stop, float &slope, float&offset){
-	float baseline = 0;
+	float baseline = 0.;
 	TF1* f_baseline = new TF1("fun baseline", "[0] + [1]*x", start, stop);
 	histo->Fit(f_baseline, "Q", "", start, stop);
 	offset = f_baseline->GetParameter(0);
 	slope = f_baseline->GetParameter(1);
-	int i = 0;
-	while ( histo->GetBinContent(i) < stop ){
+	int i = 1;
+	while ( histo->GetXaxis()->GetBinCenter(i) < stop ){
 		baseline += histo->GetBinContent(i);
 		i++;
 	}
-	baseline /= (float)i;
+	baseline /= (float)(i-1);
 	delete f_baseline;
 	return baseline;
 }

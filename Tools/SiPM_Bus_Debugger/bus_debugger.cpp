@@ -12,24 +12,31 @@
 #include <rs232/RWTH/SiPM/rs232_SiPM.h>
 #include <rs232/RWTH/SiPM/MPPC_D/MPPC_D.h>
 
-#define USB "/dev/ttyUSB2"
+#define USB "/dev/ttyUSB1"
 
 using namespace std;
 
 int main(int argc, char** argv){
+	uint16_t fe_addr = 0xFF;
+	char* dev_file;
+	int nTries = 0;
+	stringstream ssBuf;
 
-/*	TODO
-	if (argc != 2){
-		printf("Usage: ./bus_debugger <address> <number of commands>\n\te.g. ./bus_debugger 0x1F 1000\n");
+	if (argc != 4){
+		printf("Usage: ./bus_debugger <address> <device> <number of commands>\n\te.g. ./bus_debugger 1F /dev/ttyUBS1 1000\n");
 		return -1;
+	} else {
+		ssBuf << argv[1];
+		ssBuf >> hex >> fe_addr;
+		dev_file = argv[2];	
+		nTries = atoi(argv[3]);
 	}
-*/
-	// setup communication with frontend board
-	linux_rs232 usb(USB, 9600);
-	rs232_SiPM sipm(&usb, 9600);
-	MPPC_D fe(&sipm, 0x11);
 
-	const int nTries = 1000;
+	// setup communication with frontend board
+	linux_rs232 usb(dev_file, 9600);
+	rs232_SiPM sipm(&usb, 9600);
+	MPPC_D fe(&sipm, fe_addr);
+
 	double dummy = .0, ex_time[7], avg_ex_time[7];
 	string cmd_map[7] = {	"get Ubias_A",
 				"get Ubias_B",
@@ -84,15 +91,15 @@ int main(int argc, char** argv){
 			printf("%i - Success on '%s' - ret=%2.3f after %1.4fs...\n", i, cmd_map[cmd].c_str(), dummy, ex_time[cmd]);
 		} catch (llbad_SiPM_interface &ex) {
 			printf("%i - Error on %s - ret=%2.3f after '%s'\n", i, cmd_map[cmd].c_str(), dummy, ex.what());
-			err_log << err << "error on " << cmd_map[cmd] << " after " << last_cmd << " '" << ex.what() << "'" << endl;
+			err_log << err << " Error on " << cmd_map[cmd] << " after " << last_cmd << " '" << ex.what() << "'" << endl;
 			err++;
 		} catch (llbad_MPPC_D &ex) {
 			printf("%i - Error on %s - ret=%2.3f after '%s'\n", i, cmd_map[cmd].c_str(), dummy, ex.what());
-			err_log << err << "error on " << cmd_map[cmd] << " after " << last_cmd << " '" << ex.what() << "'" << endl;
+			err_log << err << " Error on " << cmd_map[cmd] << " after " << last_cmd << " '" << ex.what() << "'" << endl;
 			err++;
 		} catch (...) {
 			printf("%i - Unknown error on %s\n", i, cmd_map[cmd].c_str());
-			err_log << err << "Unknown error on " << cmd_map[cmd] << " after " << last_cmd << endl;
+			err_log << err << " Unknown error on " << cmd_map[cmd] << " after " << last_cmd << endl;
 			err++;
 		}
 
