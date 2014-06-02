@@ -12,7 +12,7 @@
 #include <rs232/RWTH/SiPM/rs232_SiPM.h>
 #include <rs232/RWTH/SiPM/MPPC_D/MPPC_D.h>
 
-#define USB "/dev/ttyUSB0"
+#define USB "/dev/ttyUSB2"
 
 using namespace std;
 
@@ -27,9 +27,9 @@ int main(int argc, char** argv){
 	// setup communication with frontend board
 	linux_rs232 usb(USB, 9600);
 	rs232_SiPM sipm(&usb, 9600);
-	MPPC_D fe(&sipm, 0x1F);
+	MPPC_D fe(&sipm, 0x11);
 
-	const int nTries = 100;
+	const int nTries = 1000;
 	double dummy = .0, ex_time[7], avg_ex_time[7];
 	string cmd_map[7] = {	"get Ubias_A",
 				"get Ubias_B",
@@ -82,11 +82,20 @@ int main(int argc, char** argv){
 			avg_ex_time[cmd] += ex_time[cmd];
 
 			printf("%i - Success on '%s' - ret=%2.3f after %1.4fs...\n", i, cmd_map[cmd].c_str(), dummy, ex_time[cmd]);
-		} catch (llbad_MPPC_D_value_return& ex) {
-			printf("%i - Error on %s - '%s'\n", i, cmd_map[cmd].c_str(), ex.what());
+		} catch (llbad_SiPM_interface &ex) {
+			printf("%i - Error on %s - ret=%2.3f after '%s'\n", i, cmd_map[cmd].c_str(), dummy, ex.what());
 			err_log << err << "error on " << cmd_map[cmd] << " after " << last_cmd << " '" << ex.what() << "'" << endl;
 			err++;
-		}	
+		} catch (llbad_MPPC_D &ex) {
+			printf("%i - Error on %s - ret=%2.3f after '%s'\n", i, cmd_map[cmd].c_str(), dummy, ex.what());
+			err_log << err << "error on " << cmd_map[cmd] << " after " << last_cmd << " '" << ex.what() << "'" << endl;
+			err++;
+		} catch (...) {
+			printf("%i - Unknown error on %s\n", i, cmd_map[cmd].c_str());
+			err_log << err << "Unknown error on " << cmd_map[cmd] << " after " << last_cmd << endl;
+			err++;
+		}
+
 		last_cmd = cmd;
 	}
 
