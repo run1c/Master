@@ -1,4 +1,5 @@
 BIN=temp_cal_cooli
+BIN2=temp_cal_analysis
 OBJ=CooliHandler.o
 CC=g++
 
@@ -18,7 +19,7 @@ LDFLAGS=-L$(LIBLAB) -L$(LIBSUB) $(ROOTGLIBS) -llab -lsubsystem
 #CFLAGS=-Wall $(ROOTCFLAGS) -I$(HOME)/include/liblab/ -I$(HOME)/include/subsystem/
 #LDFLAGS=-L$(HOME)/lib/ $(ROOTGLIBS) -llab -lsubsystem
 
-all: $(BIN)
+all: $(BIN) $(BIN2)
 
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $^
@@ -26,6 +27,10 @@ all: $(BIN)
 $(BIN): $(BIN).o $(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS) $(CFLAGS)
 
+$(BIN2): $(BIN2).o $(OBJ)
+	$(CC) $^ -o $@ $(LDFLAGS) $(CFLAGS)
+
 clean:
 	rm -f *.o
 	rm -f $(BIN)
+	rm -f $(BIN2)
