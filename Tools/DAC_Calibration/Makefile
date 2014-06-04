@@ -1,4 +1,5 @@
 BIN=dac_cal
+BIN2=dac_cal_analysis
 OBJ=
 CC=g++
 
@@ -12,7 +13,7 @@ LIBLAB=$(HOME)/liblab/
 CFLAGS=-Wall $(ROOTCFLAGS) -I$(LIBLAB) 
 LDFLAGS=-L$(LIBLAB) $(ROOTGLIBS) -llab
 
-all: $(BIN)
+all: $(BIN) $(BIN2)
 
 %.o: %.cpp
 	$(CC) -c $(CFLAGS) $^
@@ -20,6 +21,10 @@ all: $(BIN)
 $(BIN): $(BIN).o $(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS)
 
+$(BIN2): $(BIN2).o $(OBJ)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
 clean:
-	rm -f *.o
 	rm -f $(BIN)
+	rm -f $(BIN2)
+	rm -f *.o
