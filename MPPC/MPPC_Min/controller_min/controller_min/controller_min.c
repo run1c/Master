@@ -15,6 +15,28 @@
 #define ENA_LED PORTA0
 #define ENA_PIN PORTA3
 
+// commands
+#define READ_TEMP 'I'
+#define READ_TEMP_RAW 'J'
+#define SET_UBIAS_A 'A'
+#define SET_COEFF 'C'
+#define READ_UADJ_A 'D'
+#define READ_COEFF 'F'
+#define PRINT_HELP 'H'
+#define SIPM_INFO 'S'
+#define DAC_CAL 'Q'
+
+// end of message
+#define EOM "\n\r*"
+
+// MPPC status
+#define IDLE 0
+#define LISTENING 1
+#define ADDRESSED 2
+#define ISSUED 3
+#define READING 4
+#define SENDING 5
+
 void driverSend(void);
 void driverReceive(void);
 
@@ -25,31 +47,175 @@ void sendByte(char c);
 void receiveString(char* str, int len);
 void sendString(char* str);
 
+// global variables
+uint8_t MPPC_status = IDLE;
+uint8_t own_addr = 0x20;
+
 int main(void)
 {
+	// init all needed services
 	cli();
 	timer_init();
 	USART_init();
 	sei();
 	
+	// set up enable port
 	DDRA = (1 << ENA_LED) | (1 << ENA_PIN);
-	ENA_PORT = 0x00;
+	ENA_PORT = (1 << ENA_LED);
 	
 	// init condition is receiving
 	driverReceive();
 	
-	char cbuf = 'X';
+	// string, char and ascii buffers for serial comm.
+	uint8_t read_buf = 0x00, ascii_bufh = 0x00, ascii_bufl = 0x00;
+	char str_buf[10];
+	
+	// send own address on startup
+	HexToAscii(str_buf, 3, own_addr);
+	sendString(str_buf);
+	sendString(EOM);
 	
     while(1)
     {
-		ENA_PORT |= (1 << ENA_LED);
-		driverReceive();
-		cbuf = USART_receiveByte();
-		sendByte(cbuf);
-		ENA_PORT &= ~(1 << ENA_LED);
-		//zsleep_ms(1000);
+		// check if there is something to be read (non blocking...)
+		if ( USART_dataAvaliable() ){
+			read_buf = 0x00;
+			read_buf = USART_readByte();
+			switch(MPPC_status){
+				
+				/* no start delimiter, awaits start delimiter */
+				
+				case IDLE:
+				if (read_buf == '<'){
+					MPPC_status = LISTENING;
+				} else {
+					MPPC_status = IDLE;
+					sleep_ms(2);
+				}
+				break;
+	
+				/* received a start delimiter, awaits adress */
+				
+				case LISTENING:
+				// check wether there are characters or ASCII numbers beeing send
+				if ( ((read_buf >= '0') && (read_buf <= '9')) ||
+				((read_buf >= 'A') && (read_buf <= 'F')) ) {
+					// a ASCII number has been sent, we need another digit
+					str_buf[0] = read_buf;
+					str_buf[1] = USART_receiveByte();
+					// convert both ascii numbers into a 'real' hex number
+					read_buf = AsciiToHex(str_buf, 2);
+					HexToAscii(str_buf, 3, read_buf);
+				} else {
+					// in this stage we need an address; if there are no numbers beeing sent, we are not interested anymore!
+					MPPC_status = IDLE;
+					break;
+				}
+				// We received an address, converted it to hex and now want to check, if it is our's
+				if (read_buf == own_addr){
+					MPPC_status = ADDRESSED;
+					// SEL_LED on -> module has been selected + echo
+					sendString(str_buf);
+					ENA_PORT&= ~(1 << ENA_LED);
+					// echo in ASCII
+				} else {
+					MPPC_status = IDLE;
+				}
+				break;
+
+				/* received it's own address, awaits command */
+				
+				case ADDRESSED:
+				if (read_buf == '>'){	// stop delimiter
+					MPPC_status = IDLE;
+					ENA_PORT |= (1 << ENA_LED);	// SEL_LED off -> module has been deselected
+				} else {
+					command_handler(read_buf);	// yet another switch/case stucture...
+				}
+				break;
+
+			} // end switch
+
+		} // end if
 	}
 }
+
+	/////////////
+	// METHODS //
+	/////////////
+
+void command_handler(uint8_t command){
+	uint16_t wbuf;
+	uint8_t bufh, bufl;
+	float fbuf;
+	char sbuf[10];
+	switch(command){
+
+		/* read temperature in human readable form */
+
+		case READ_TEMP:
+		sendByte(command);
+		sendString(EOM);
+		break;
+
+		/* read temperature in raw ADC counts */
+		case READ_TEMP_RAW:
+		sendByte(command);
+		sendString(EOM);
+		break;
+
+		/* set operational voltage @25°C */
+
+		case SET_UBIAS_A:
+		// echo the command
+		sendByte(command);
+		sendString(EOM);
+		break;
+
+		/* set the temperature progression coefficient */
+
+		case SET_COEFF:
+		// echo...
+		sendByte(command);
+		sendString(EOM);
+		break;
+
+		/* read the calculated adjusted operational voltage */
+
+		case READ_UADJ_A:
+		sendByte(command);
+		sendString(EOM);
+		break;
+
+		/* read temperature coefficient */
+
+		case READ_COEFF:
+		sendByte(command);
+		sendString(EOM);
+		break;
+
+		/* print help */
+
+		case PRINT_HELP:
+		sendByte(command);
+		sendString("HW Version x.x SW Version 2.0");
+		sendString(EOM);
+		break;
+
+		/* print sipm info of module */
+		case SIPM_INFO:
+		sendByte(command);
+		sendString(EOM);
+		break;
+	
+		default:
+		MPPC_status = ADDRESSED;
+	}
+
+
+}
+
+
 
 void driverSend(void){
 	ENA_PORT |= (1 << ENA_PIN);		// enable driver
@@ -61,7 +227,6 @@ void driverReceive(void){
 	ENA_PORT &= ~(1 << ENA_PIN);	// disable driver
 	return;
 }
-
 
 uint32_t AsciiToHex(char* str, int len){
 	// extract the number
@@ -127,4 +292,8 @@ void sendString(char* str){
 	}
 	sleep_ms(2*len);
 	return;
+}
+
+ISR(USART0_TX_vect){
+	driverReceive();	
 }

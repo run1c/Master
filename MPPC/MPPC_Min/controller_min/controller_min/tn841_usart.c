@@ -33,7 +33,7 @@ void USART_sendByte(char c){
 	// wait until UDRE0 = 0 => data buffer is empty and ready to be written to
 	while ( !( UCSR0A & (1 << UDRE0) ) ){};
 	UDR0 = c;	// send character
-	return;z
+	return;
 }
 
 void USART_sendString(char* s){
@@ -73,6 +73,3 @@ void USART_receiveString(char* str, int len){
 	(*str) = '\0';
 }
 
-ISR(USART0_TX_vect){
-	
-}
