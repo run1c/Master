@@ -38,6 +38,7 @@ SUBDIRS :=
 C_SRCS +=  \
 ../controller_min.c \
 ../tn814_timer.c \
+../tn841_adc.c \
 ../tn841_usart.c
 
 
@@ -50,21 +51,25 @@ ASM_SRCS +=
 OBJS +=  \
 controller_min.o \
 tn814_timer.o \
+tn841_adc.o \
 tn841_usart.o
 
 OBJS_AS_ARGS +=  \
 controller_min.o \
 tn814_timer.o \
+tn841_adc.o \
 tn841_usart.o
 
 C_DEPS +=  \
 controller_min.d \
 tn814_timer.d \
+tn841_adc.d \
 tn841_usart.d
 
 C_DEPS_AS_ARGS +=  \
 controller_min.d \
 tn814_timer.d \
+tn841_adc.d \
 tn841_usart.d
 
 OUTPUT_FILE_PATH +=controller_min.elf
@@ -78,6 +83,8 @@ OUTPUT_FILE_DEP:= ./makedep.mk
 LIB_DEP+= 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

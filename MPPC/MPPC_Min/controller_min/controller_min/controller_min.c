@@ -9,6 +9,7 @@
 #include <avr/io.h>
 #include "tn841_timer.h"
 #include "tn841_usart.h"
+#include "tn841_adc.h"
 
 #define ENA_PORT PORTA
 #define ENA_DDR DDRA
@@ -42,10 +43,14 @@ void driverReceive(void);
 
 uint32_t AsciiToHex(char* str, int len);
 void HexToAscii(char* buf, int len, uint32_t hex);
+void floatToString(float val, char* string);
 
 void sendByte(char c);
 void receiveString(char* str, int len);
 void sendString(char* str);
+
+void command_handler(uint8_t command);
+float getTemperature(uint16_t temp);
 
 // global variables
 uint8_t MPPC_status = IDLE;
@@ -57,6 +62,7 @@ int main(void)
 	cli();
 	timer_init();
 	USART_init();
+	ADC_init();
 	sei();
 	
 	// set up enable port
@@ -155,12 +161,18 @@ void command_handler(uint8_t command){
 
 		case READ_TEMP:
 		sendByte(command);
+		fbuf = getTemperature( ADC_read() );
+		floatToString(fbuf, sbuf);
+		sendString(sbuf);
 		sendString(EOM);
 		break;
 
 		/* read temperature in raw ADC counts */
 		case READ_TEMP_RAW:
 		sendByte(command);
+		wbuf = ADC_read();
+		HexToAscii(sbuf, 4, wbuf);
+		sendString(sbuf);
 		sendString(EOM);
 		break;
 
@@ -257,6 +269,41 @@ void HexToAscii(char* buf, int len, uint32_t hex){
 	return;
 }
 
+void floatToString(float val, char* string){
+	int temp, i = 1;
+	float dec = 10;
+	// get the right sign
+	if (val < 0) {
+		string[0] = '-';
+	val *= -1.0;}
+	else {
+		string[0] = '+';
+	}
+
+	do{
+		if (dec == 0.1f){	// decimal point
+			string[i] = '.';
+			i++;
+		}
+
+		if (val < dec) {
+			string[i] = '0';
+			} else {
+			temp = val/dec;
+			string[i] = temp + '0';
+			val -= temp*dec;
+		}
+
+		// inc counter
+		i++;
+		dec /= 10;
+	} while (i < 7);
+	string[7] = '\0';
+
+	return;
+}
+
+
 void receiveString(char* str, int len){
 	int ctr = 0;
 	while (ctr < len){
@@ -292,6 +339,11 @@ void sendString(char* str){
 	}
 	sleep_ms(2*len);
 	return;
+}
+
+float getTemperature(uint16_t temp){
+	float voltage = (float)temp/1024. * 1.1;	// 10 bit adc, internal 1V1 analog reference
+	return ( (voltage - 0.5) * 100. );	// 500mV offset = 0degC, 0.01V/degC = 100degC/V
 }
 
 ISR(USART0_TX_vect){

@@ -131,6 +131,12 @@
     <Compile Include="tn814_timer.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="tn841_adc.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="tn841_adc.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="tn841_usart.c">
       <SubType>compile</SubType>
     </Compile>
