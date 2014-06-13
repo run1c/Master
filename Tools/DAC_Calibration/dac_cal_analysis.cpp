@@ -45,17 +45,19 @@ int main(int argc, char** argv){
 
 	TFile* out_file = new TFile("out.root", "recreate");
 	TH1F* volt_histo = new TH1F("volt", "h_volt", 1000, volt_min - 10., volt_max + 10.);
-	TH1F* volt_rms_histo = new TH1F("voltage RMS", "h_volt_rms", 21 ,-2., 2.);
+	TH1F* volt_rms_histo = new TH1F("voltage RMS", "voltage RMS", 25 , 0., 2.5);
 	TF1* lin_fit = new TF1("lin_fit", "[0] + [1]*x", dac_min, dac_max);
 
 	float volt_mean, volt_rms;
 	TGraphErrors* gr_dac_vs_volt = new TGraphErrors();
-	gr_dac_vs_volt->SetTitle("output voltage vs. DAC counts;DAC [counts];U_{out} [mV]");
+	gr_dac_vs_volt->SetTitle("output voltage vs. DAC counts;DAC [counts];U_{out} [V]");
+	gr_dac_vs_volt->GetYaxis()->SetTitleOffset(1.55);
 	gr_dac_vs_volt->SetLineColor(35);
 	gr_dac_vs_volt->SetMarkerStyle(7);
 
 	TGraphErrors* gr_residuals = new TGraphErrors();
-	gr_residuals->SetTitle("residuals;DAC [counts];U_{out} [mV]");
+	gr_residuals->SetTitle("residuals;DAC [counts];U_{out} - U_{fit} [mV]");
+	gr_residuals->GetYaxis()->SetTitleOffset(1.55);
 	gr_residuals->SetLineColor(35);
 	gr_residuals->SetMarkerStyle(7);
 	TF1* zero = new TF1("zero", "0", -1e6, 1e6);
@@ -85,8 +87,8 @@ int main(int argc, char** argv){
 
 		// fill taken data into corresponding histos/graphs
 		volt_rms_histo->Fill(volt_rms);
-		gr_dac_vs_volt->SetPoint(iStep, dac_counts, volt_mean);
-		gr_dac_vs_volt->SetPointError(iStep, 0., volt_rms);
+		gr_dac_vs_volt->SetPoint(iStep, dac_counts, volt_mean/1000.);	// plot in V, not mV
+		gr_dac_vs_volt->SetPointError(iStep, 0., volt_rms/1000.);
 
 		// write out..
 		volt_histo->Write();
@@ -98,8 +100,8 @@ int main(int argc, char** argv){
 	for (int i = 0; i < nSteps; i++){
 		in_tree->GetEntry(i*nMeas + 1);
 		res = gr_dac_vs_volt->GetY()[i] - lin_fit->Eval(dac_counts);
-		gr_residuals->SetPoint(i, dac_counts, res);
-		gr_residuals->SetPointError(i, 0., gr_dac_vs_volt->GetErrorY(i));
+		gr_residuals->SetPoint(i, dac_counts, res*1000.);
+		gr_residuals->SetPointError(i, 0., gr_dac_vs_volt->GetErrorY(i)*1000.);	// plot in mV..
 	}	
 
 	TCanvas* c1 = new TCanvas();
