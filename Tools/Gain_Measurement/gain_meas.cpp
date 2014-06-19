@@ -16,7 +16,7 @@
 
 using namespace std;
 
-//#define VERBOSE
+#define VERBOSE
 
 // determines the baseline by fitting a line to the first n points of the histo
 // slope and offset determine the quality of the fit
@@ -47,7 +47,7 @@ int main(int argc, char** argv){
  
 	// scope setup
 	const int sample_len = 500;	// or 10000 (slower...)
-	scope.selectSource(TDS3000_CH1);
+	scope.selectSource(TDS3000_CH2);
 	scope.setRecordLength(sample_len);
 	scope.setStartPoint(1);
 	scope.setStopPoint(sample_len);
@@ -99,6 +99,7 @@ int main(int argc, char** argv){
 		// save
 		out_tree->Fill();
 #ifdef VERBOSE
+		printf("[Gain Measurement] - # SAMPLE %i # \n", iSample);
 		printf("[Gain Measurement] - baseline = %fV\n", baseline);
 		printf("[Gain Measurement] - pulse height = %fV\n", pulse_height);
 		h_pulse->Write();

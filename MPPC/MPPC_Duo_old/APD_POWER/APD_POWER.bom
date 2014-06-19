@@ -1,0 +1,55 @@
+               B I L L   O F   M A T E R I A L S								
+								
+Project name: F:\ULTI_Prj\APD_POWER\APD_POWER.UTSCH								
+Time & date:  14:10:02  22-Dec-2010								
+								
+#		UT_DEVICE		UT_VALUE		UT_PKGTYPE		Refdes
+----------------------------------------------------------------------------------------------------------								
+								
+1		CORE_COIL		100	FEP10X4R12			L1
+1		DC/DC_TEN8		TEN8-1211	DC/DC_TEN8			U5
+1		DIN_96ABC		DIN_96ABC	DIN41612ABC			J8
+1		FT232RL			FT232RL	SSOP28		U2
+1		HDR_9			HDR_9	DB9FLW		J7
+1		LM2940-5		LM2940-5	78XXH			U4
+1		LM2990-5		LM2990-5	79XXH			U3
+1		MAX3086			MAX3086	SO14		U1
+1		MHV12-180		MHV12-180	MHV12-180			U6
+1		POT.METER_2		5k	SPITRI64W			R11
+1		RESISTOR		0	R0603			R10
+1		RESISTOR		120	R0603			R7
+1		USB_B			HDR_6	USB_B		J1
+2		CAPACITOR		10nF-100V	CRM5A			C15
+								C18
+2		ELCO		47?F	ELKO13R5			C9
+								C10
+2		FUSE		1A	CRM5A			F1
+								F2
+2		HCPL9030		HCPL903	DIP8			U7
+								U8
+2		RESISTOR		27	R0603			R8
+								R9
+3		CAPACITOR		100nF	C0603			C2
+								C4
+								C1
+3		ELCO		470?F		ELKO13R5		C6
+								C7
+								C8
+8		CAPACITOR		100nF		CRM5A		C12
+								C3
+								C13
+								C14
+								C5
+								C16
+								C17
+								C11
+8		HDR_1		HDR_1		PIN		J9
+								J10
+								J11
+								J12
+								J3
+								J4
+								J5
+								J6
+								
+Current processed Variant : DEFAULT								
