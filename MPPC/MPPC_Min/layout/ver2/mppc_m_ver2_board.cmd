@@ -159,14 +159,6 @@ ChangePinName(U1, 1, GND)
 ChangePinName(C6, 2, 2)
 ChangePinName(C6, 1, 1)
 
-# Start of element R2
-ChangePinName(R2, 1, 1)
-ChangePinName(R2, 2, 2)
-
-# Start of element D0
-ChangePinName(D0, 2, 2)
-ChangePinName(D0, 1, 1)
-
 # Start of element R1
 ChangePinName(R1, 1, 1)
 ChangePinName(R1, 2, 2)
