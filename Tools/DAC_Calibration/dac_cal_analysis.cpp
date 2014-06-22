@@ -14,7 +14,7 @@ int main(int argc, char** argv){
    	gSystem->Load("libTree");
 
 	if (argc != 2){
-		printf("Usage: ./dac_cal_analysis <temp cal file>\n");
+		printf("Usage: ./dac_cal_analysis <dac cal file>\n");
 		return -1;
 	}
 	// open file
@@ -44,9 +44,10 @@ int main(int argc, char** argv){
 	printf("[DAC Analysis] - Range DAC (%i..%i), range voltage (%.1f..%.1f)mV.\n", dac_min, dac_max, volt_min, volt_max);
 
 	TFile* out_file = new TFile("out.root", "recreate");
-	TH1F* volt_histo = new TH1F("volt", "h_volt", 1000, volt_min - 10., volt_max + 10.);
+	TH1F* volt_histo = new TH1F("volt", "h_volt", (int)(volt_max - volt_min), volt_min - 10., volt_max + 10.);
 	TH1F* volt_rms_histo = new TH1F("voltage RMS", "voltage RMS", 25 , 0., 2.5);
 	TF1* lin_fit = new TF1("lin_fit", "[0] + [1]*x", dac_min, dac_max);
+	lin_fit->SetParNames("U_{0} [V]", "#DeltaU/#DeltaDAC [V/counts]");
 
 	float volt_mean, volt_rms;
 	TGraphErrors* gr_dac_vs_volt = new TGraphErrors();
@@ -68,6 +69,8 @@ int main(int argc, char** argv){
 	for (int iStep = 0; iStep < nSteps; iStep++){
 		in_tree->GetEntry(iStep*nMeas);
 		volt_histo->Reset();
+		in_tree->GetEntry(iStep*nMeas + 1);
+		volt_histo->GetXaxis()->SetRangeUser(volt - 10., volt + 10.);
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
 			in_tree->GetEntry(iMeas + iStep*nMeas);
 			volt_histo->Fill(volt);

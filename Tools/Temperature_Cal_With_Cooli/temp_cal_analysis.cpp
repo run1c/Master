@@ -8,6 +8,7 @@
 #include <TH1F.h>
 #include <TGraphErrors.h>
 #include <TMultiGraph.h>
+#include <TLegend.h>
 
 int main(int argc, char** argv){
 
@@ -34,9 +35,6 @@ int main(int argc, char** argv){
 	in_tree->SetBranchAddress("nMeas", &nMeas);
 	in_tree->SetBranchAddress("nSteps", &nSteps);
 	in_tree->SetBranchAddress("timestamp", &time);
-
-	TCanvas* c1 = new TCanvas();
-	c1->Divide(2);
 
 	// get nMeas and nSteps
 	in_tree->GetEntry(0);
@@ -67,6 +65,7 @@ int main(int argc, char** argv){
 	t_diff->SetLineColor(30);
 	TMultiGraph* mg = new TMultiGraph();
 	mg->SetTitle("Temperature Progression;t [s];T[#circC]");
+	TLegend* leg = new TLegend(0.1, 0.1, 0.2, 0.2, "");
 	
 	printf("[Temperature Analysis]\tstep\tpt100\trms\tcooli\trms\tdiff\trms\n");
 	printf("[Temperature Analysis]\t==================================================\n");
@@ -122,7 +121,17 @@ int main(int argc, char** argv){
 	mg->Add(t_pt100);
 	mg->Add(t_cooli);
 	mg->Add(t_diff);
-	mg->Write();
+
+	leg->AddEntry(t_pt100, "PT100 probe", "p");
+	leg->AddEntry(t_cooli, "Sensirion probe (Cooli)", "p");
+	leg->AddEntry(t_diff, "temperature difference", "p");
+	// graphics output
+	TCanvas* c2 = new TCanvas();
+	mg->Draw("ap");
+	leg->Draw("same");
+	c2->Write();
+
+//	mg->Write();
 	// cleanup
 	out_file->Close();
 	in_file->Close();
