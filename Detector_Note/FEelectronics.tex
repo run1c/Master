@@ -157,12 +157,13 @@ $R_7$ provides the discussed current feedback to the Pt100 resistor depending on
  
 \subsubsection{Temperature Probe Calibration}
 
-To get the precise dependency of the output voltage of the temperature probe on the temperature one hast to perform a calibration for the module. A fast calibration is currently beeing
-done by using a Pt100 simulator. A Pt100 simulator is a simple box that mimics the temperature dependecy of a Pt100 resistor. By setting the simulator the a certain temperature the 
-resistance between it's both output lines is equal to the resistance a Pt100 resistor would have at the given temperature. The output lines can be attached to the frontend board
-instead of the Pt100 resistor for a fast calibration.
-
-TODO: RESULTS
+The output voltage of the temperature probe is measured by a $10$ bit ADC on the microcontroller. Internally the temperature then is calculated by the following equation:
+\begin{equation}
+	T[^{\circ}C] = TGain[^{\circ}C/count] \times ADCcount + TOffset[^{\circ}C]
+\end{equation}
+The calibration of the temperature probe can be done by simply exposing the probe to a well regulated temperature and reading it's ADC register. The $10$ bit ADC of the microcontroller
+can be read out with the command "J". For a fast temperature calibration one also can use a Pt100 simulator. This simulator is a potentiometer that can be set to a certain 
+temperature value and outputs the corresponding resistance of a Pt100 resistor at the given temperature value. 
 
 \newpage
 
@@ -210,45 +211,17 @@ are set to $0$ and $DACGain$ to $1$ thus disabling the temperature correction. A
 at $25^{\circ} \text{C}$ with the command "Dhhhh" or "Ehhhh" to the hex value $5\times0xhhhh$. By setting the DAC output registers to a given value and then measuring the 
 output adjusted bias voltage one can easily perform a calibration.
 
-The DAC calibration is done at a stable temperature with the module switched to calibration mode. To get the dependency of the output voltage to the DAC counts the DAC is set to fixed value and 
-the output bias voltage of the regulator is measured with a precise volt meter. The result of one of these measurements is shown in Figure \ref{fig:dac_cal_single_shot}. Currently the calibration is
-done with $100$ measurements for each point with $30$ points in total and is ranged from $69..73\,\text{V}$. The result of calibration including the linear regression is shown in Figure 
-\ref{fig:dac_cal_total}. To characterize the precision of the set bias voltage one can look at the RMS of single point measurements. Figure \ref{fig:dac_precision} shows the distribution of the RMS 
-of the single point measurements and Table \ref{tab:dac_prec_result} holds the mininum, mean and maximum RMS as a result of the precision analysis.
-
-	\begin{figure}[t]
-		\centering
-			\includegraphics[width=0.6\textwidth]{Figures/weinstock/dac_cal_point.pdf}
-		\caption{Result of a single point measurement of the voltage regulator.}
-		\label{fig:dac_cal_single_shot}
-	\end{figure}	
-	
-	\begin{figure}[t]
-		\centering
-			\includegraphics[width=1.\textwidth]{Figures/weinstock/dac_cal_B.pdf}
-		\caption{DAC calibration including results of the linear regression. The error on the voltage is the RMS voltage distribution for each single point 
-			(see Fig. \ref{fig:dac_cal_single_shot}). 
-			$\Delta U / \Delta DAC$ is the $DACGain$ and $U_0$ is the $DACOffset$. The residuals seem to show a non linear
-			systematic, but it is charactistic for this one voltage regulator and is small enough to be neglected.}
-		\label{fig:dac_cal_total}
-	\end{figure}	
-	
-	\begin{figure}[t]
-		\centering
-			\includegraphics[width=0.6\textwidth]{Figures/weinstock/dac_B_RMS.pdf}
-		\caption{Single point measurement RMS distribution of all $30$ points of the calibration.}
-		\label{fig:dac_precision}
-	\end{figure}	
-
-\newpage
-
 \subsubsection{Amplifier Circuits}
 
 The MPPC\_D uses Current Feedback Amplifiers (CFA) instead of Voltage Feedback Amplifiers (VFA) because of the superior gain-bandwidth product of these amplifiers. A high 
 gain-bandwidth product is needed because the Geiger discharges on the SiPM create high speed rising edges. The steep rising edges provide the fastest information of an incoming photon. 
 By not distorting these high speed components the trigger information becomes avaliable faster.
 
-The amplifiers used on the MPPC\_D are the \emph{MAX4228} 
+The amplifier chip used on the MPPC\_D is the \emph{MAX4228} which has a bandwidth of up $1\,\text{GHz}$ at unity gain. The whole amplifier circuit is shown in Figure \ref{fig:amp_cir}. The first
+ampflification stage is a transimpedance amplifier. This preamplifier converts a current signal into a voltage signal:
+\begin{equation}
+	U_{preamp} = R_{20} I_{SiPM}
+\end{equation}
 
 \subsubsection{Overview Of Technical Characteristics}
 
