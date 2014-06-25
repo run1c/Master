@@ -12,7 +12,7 @@ Figure \ref{APDPI_front} shows the front panel of an APDPI module: On the top th
 Below the connector there are two switches BIAS and POWER and again below that a USB B plug.
 
 The $+12\,\text{V}$ line of the NIM backend is fed to a DC-DC converter that is adjustable via a potentiometer located next to the converter.
-The converter takes $10.8\,\text{V} .. 13.2\,\text{V}$ and outputs $0\,\text{V} .. 180\,\text{V}@15\,\text{mA}$ to the VBIAS line. The BIAS switch is located directly below the i
+The converter takes $10.8\,\text{V} .. 13.2\,\text{V}$ and outputs $0\,\text{V} .. 180\,\text{V}@15\,\text{mA}$ to the VBIAS line. The BIAS switch is located directly below the
 DSUB-9 connector and switches VBIAS on and off. The typical VBIAS voltage currently used is $82\,\text{V}$.
 
 V+ and V- supply a $\pm3.3\,\text{V}@1\text{A}$ power source respectively for the amplifier and logic circuits of the frontend electronics. There are two voltage regulators 
@@ -24,13 +24,12 @@ module to reduce noise.
 RTX+ and RTX- are the differential EIA-485 compliant outputs used for communication with and slow control of the frontend electronics. The EIA-485 (or RS-485) 
 defines a physical layer that uses a differential signal for communcation thus providing a stable signal over distances of up to $1.2\,\text{km}$. The data link layer is 
 compliant to the microcontroller friendly Universal Synchronous/Asynchronous Receiver Transmitter (USART) which simplifies the whole commucation chain in hardware. 
-For more details on RS-485 see [\ref{wiki_eia485}].
 A computer can be connected to the APDPI via a USB B plug located beneath the POWER switch. The USB signal is mapped to USART by a \emph{FT232RL} 
-chip [\ref{ftdi_datasheet}] and again converted to RS-485 by a \emph{MAX3086E} chip [\ref{max3086e_datasheet}] thus the slow control can be accessed with a simple 
-FTDI serial driver [\ref{ftdi_ser_driver}].
+chip and again converted to RS-485 by a \emph{MAX3086E} chip thus the slow control can be accessed with a simple 
+FTDI serial driver.
 The \emph{MAX3086E} transceiver provides a half duplex communication interface meaning that the driver uses the same data lines to transmit and receive data.
 
-	\begin{figure}[]
+	\begin{figure}[t]
 		\centering
 			\includegraphics[width=1.0\textwidth]{Figures/weinstock/apdpi.png}
 		\caption{\textbf{Left:} Front plate of an APDPI. \textbf{Right:} APDPI circuit: 1. $470\,\mu \text{F}$ bypass capacitors for the $\pm6\,\text{V}$ and $12\,\text{V}$ 
@@ -87,8 +86,8 @@ bits of data per frame, no parity bit, one stop bit to maximize data throughput.
 			\hline
 			\end{tabular}
 		\end{center}
-		\label{sipm_bus_table}
 		\caption{Overview of all commands supported by firmware version $<2.0$. Note that modules with only one SiPM neither support command "B" nor "E".}
+		\label{sipm_bus_table}
 	\end{table}
 
 \subsection{MPPC Dou Controller}
@@ -96,18 +95,18 @@ bits of data per frame, no parity bit, one stop bit to maximize data throughput.
 The Multi Pixel Photon Counter Duo Controller (MPPC\_D) is the current frontend electronics prototype for the MTT project. It features regulated bias voltages for up to two SiPMs, 
 a Pt100 based temperature probe, one LEMO output for each single SiPM and a sum channel LEMO output.
 
-The core part of the MPPC\_D is an \emph{ATmega88P} [\ref{atmega88pa_datasheet}]. The \emph{ATmega88P} is an 8 bit microcontroller designed for very low power consumption, features a 
-USART interface, 10 bit DACs, a Serial Peripheral Interface (SPI) [\ref{spi_info}], $512\,B$ of EEPROM and is run with an $1\,\text{MHz}$ internal system clock to minimize 
+The core part of the MPPC\_D is an \emph{ATmega88P}. The \emph{ATmega88P} is an 8 bit microcontroller designed for very low power consumption, features a 
+USART interface, 10 bit DACs, a Serial Peripheral Interface (SPI), $512\,B$ of EEPROM and is run with an $1\,\text{MHz}$ internal system clock to minimize 
 power consumption. 
 
 The MPPC\_D can be connected to the APDPI by a ribbon cable featuring a male DSUB-9 connector and one or several 6 pin jacks which can be plugged into the boxed 6 pin header
 located on the frontend board. When connecting multiple MPPC\_Ds to one APDPI one must not only consider address conflicts, but also power consumption of the modules for the APDPI
 can supply only $15\,\text{mA}@82\,\text{V}$ and $1\,\text{A}@\pm3.3\,\text{V}$. The RTX+ and RTX- lines from the APDPI are directly fed into a \emph{MAX13430E} low power RS-485 
-transceiver chip [\ref{max13430e_datasheet}] and is used by the microcontroller's USART for serial communication using the SiPM bus protocol.  
+transceiver chip and is used by the microcontroller's USART for serial communication using the SiPM bus protocol.  
 
 Figure \ref{mppc_top} shows a picture of all functional units of the frontend board.
 	
-	\begin{figure}[]
+	\begin{figure}[t]
 		\centering
 			\includegraphics[width=0.5\textwidth]{Figures/weinstock/mppc_d_titled.png}
 		\caption{Top down view of the MPPC\_Ds circuitry: 1. ATmega88P with it's 6 pin ICSP header on the bottom left; 
@@ -127,7 +126,7 @@ Figure \ref{mppc_top} shows a picture of all functional units of the frontend bo
 
 Because of the strong temperature dependency of the SiPMs output pulses a precise temperature measurement is needed to adjust the bias voltage of the SiPMs. The temperature probe of
 the MPPC\_D measures the temperature by measuring the resistance of a Pt100 resistor. The probe's circuit consists of a Wheatstone bridge including the Pt100, an amplifier circuit using
-the \emph{MAX4040} OpAmp [\ref{max4040_datasheet}] to compensate the non linearities of the bridge and another MAX4040 OpAmp as a buffer to supply the probe with the
+the \emph{MAX4040} OpAmp to compensate the non linearities of the bridge and another MAX4040 OpAmp as a buffer to supply the probe with the
 internal Analog Reference (AREF) of $1.1\,\text{V}$ from the microcontroller as shown in Figure \ref{pt100_probe}.
 
 The resistance of the Pt100 changes as follows:
@@ -149,7 +148,7 @@ $R_{11}$ set the required gain and offset of the amplifier to produce the desire
 
 $R_7$ provides the discussed current feedback to the Pt100 resistor depending on the output of the amplifier.
 
-	\begin{figure}[]
+	\begin{figure}[t]
 		\centering
 			\includegraphics[width=0.6\textwidth]{Figures/weinstock/pt100_probe.png}
 		\caption{Schematics of the Pt100 based temperature probe of the MPPC\_D. The resistor $R_{10}$ is the Pt100 resistor.}
@@ -172,7 +171,7 @@ TODO: RESULTS
 To compensate the temperature effects on the SiPM the bias voltage has to be corrected by a factor of $\frac{\Delta U_{bias}}{\Delta T} = 56\,\frac{mV}{K}$. The MPPC\_D has two 
 voltage regulators to apply the correct bias voltage to each SiPM. The schematics of a voltage regulator are shown in Figure \ref{voltage_regulator}. 
 	
-	\begin{figure}[]
+	\begin{figure}[t]
 		\centering
 			\includegraphics[width=0.6\textwidth]{Figures/weinstock/dac_circuit.png}
 		\caption{Schematics of one of the voltage regulators on the MPPC\_D. The regulated bias voltage is output to $VB_1$.}
@@ -181,7 +180,7 @@ voltage regulators to apply the correct bias voltage to each SiPM. The schematic
 
 The voltage regulators use a Pulse Width Modulation (PWM) signal to adjust the bias voltages. PWM is used to reduce power consumption.
 The core parts of the voltage regulator are two high voltage transistors $T_1$ and $T_2$ and an integrating amplifier circuit built around another MAX4040. The integrator increases
-it's output voltage as long as the voltage drop at the divider $R_{24}$, $R_{31}$ and $R_{33}$ is below the voltage input of the 16 bit MAX5134 DAC [\ref{max5134_datasheet}].
+it's output voltage as long as the voltage drop at the divider $R_{24}$, $R_{31}$ and $R_{33}$ is below the voltage input of the 16 bit MAX5134 DAC.
 The voltage on the voltage divider is increased by the output of $T_1$ which again is influenced by the amplifier's output. The result of this feedback is a rectangular output
 pulse at $T_1$. The duty cycle of this pulse is determined by ratio of the voltage given by the DAC and the voltage drop of the divider:
 	\begin{eqnarray}
@@ -211,7 +210,35 @@ are set to $0$ and $DACGain$ to $1$ thus disabling the temperature correction. A
 at $25^{\circ} \text{C}$ with the command "Dhhhh" or "Ehhhh" to the hex value $5\times0xhhhh$. By setting the DAC output registers to a given value and then measuring the 
 output adjusted bias voltage one can easily perform a calibration.
 
-TODO: RESULTS	
+The DAC calibration is done at a stable temperature with the module switched to calibration mode. To get the dependency of the output voltage to the DAC counts the DAC is set to fixed value and 
+the output bias voltage of the regulator is measured with a precise volt meter. The result of one of these measurements is shown in Figure \ref{fig:dac_cal_single_shot}. Currently the calibration is
+done with $100$ measurements for each point with $30$ points in total and is ranged from $69..73\,\text{V}$. The result of calibration including the linear regression is shown in Figure 
+\ref{fig:dac_cal_total}. To characterize the precision of the set bias voltage one can look at the RMS of single point measurements. Figure \ref{fig:dac_precision} shows the distribution of the RMS 
+of the single point measurements and Table \ref{tab:dac_prec_result} holds the mininum, mean and maximum RMS as a result of the precision analysis.
+
+	\begin{figure}[t]
+		\centering
+			\includegraphics[width=0.6\textwidth]{Figures/weinstock/dac_cal_point.pdf}
+		\caption{Result of a single point measurement of the voltage regulator.}
+		\label{fig:dac_cal_single_shot}
+	\end{figure}	
+	
+	\begin{figure}[t]
+		\centering
+			\includegraphics[width=1.\textwidth]{Figures/weinstock/dac_cal_B.pdf}
+		\caption{DAC calibration including results of the linear regression. The error on the voltage is the RMS voltage distribution for each single point 
+			(see Fig. \ref{fig:dac_cal_single_shot}). 
+			$\Delta U / \Delta DAC$ is the $DACGain$ and $U_0$ is the $DACOffset$. The residuals seem to show a non linear
+			systematic, but it is charactistic for this one voltage regulator and is small enough to be neglected.}
+		\label{fig:dac_cal_total}
+	\end{figure}	
+	
+	\begin{figure}[t]
+		\centering
+			\includegraphics[width=0.6\textwidth]{Figures/weinstock/dac_B_RMS.pdf}
+		\caption{Single point measurement RMS distribution of all $30$ points of the calibration.}
+		\label{fig:dac_precision}
+	\end{figure}	
 
 \newpage
 

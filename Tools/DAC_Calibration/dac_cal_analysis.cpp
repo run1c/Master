@@ -44,8 +44,8 @@ int main(int argc, char** argv){
 	printf("[DAC Analysis] - Range DAC (%i..%i), range voltage (%.1f..%.1f)mV.\n", dac_min, dac_max, volt_min, volt_max);
 
 	TFile* out_file = new TFile("out.root", "recreate");
-	TH1F* volt_histo = new TH1F("volt", "h_volt", (int)(volt_max - volt_min), volt_min - 10., volt_max + 10.);
-	TH1F* volt_rms_histo = new TH1F("voltage RMS", "voltage RMS", 25 , 0., 2.5);
+	TH1F* volt_histo = new TH1F("volt", "h_volt; bias voltage [mV]", (int)(volt_max - volt_min), volt_min - 10., volt_max + 10.);
+	TH1F* volt_rms_histo = new TH1F("voltage RMS", "voltage RMS;RMS [mV];#", 25 , 0., 2.5);
 	TF1* lin_fit = new TF1("lin_fit", "[0] + [1]*x", dac_min, dac_max);
 	lin_fit->SetParNames("U_{0} [V]", "#DeltaU/#DeltaDAC [V/counts]");
 
