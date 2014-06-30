@@ -16,7 +16,7 @@
 #include <TF1.h>
 #include <TGraphErrors.h>
 
-#define SIPM_COM "/dev/ttyUSB1"
+#define SIPM_COM "/dev/ttyUSB0"
 
 using namespace std;
 
@@ -89,7 +89,17 @@ int main(int argc, char** argv){
 	
 		// take measurements
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
-			adc_count = fe.get_temperature_raw();
+			try{
+				adc_count = fe.get_temperature_raw();
+			} catch ( llbad_MPPC_D &ex ) {
+				printf("[Temp Cal] - MPPC_C failed, ex.what = '%s'\n", ex.what());
+				iMeas--;
+				continue;
+			} catch ( llbad_linux_rs232 &ex ) {
+				printf("[Temp Cal] - rs232 failed, ex.what = '%s'\n", ex.what());
+				iMeas--;
+				continue;
+			}
 			cur_time = time(0);
 			timestamp = cur_time - time0;
 			out_tree->Fill();
