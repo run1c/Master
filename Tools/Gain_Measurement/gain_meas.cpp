@@ -40,7 +40,7 @@ int main(int argc, char** argv){
 	} 
 
 	// serial port setup
-	linux_rs232 com("/dev/ttyUSB0", 38400);
+	linux_rs232 com("/dev/ttyUSB3", 38400);
 	TDS3000 scope(&com);
 
 	printf("[Gain Measurement] - Init scope..\n");

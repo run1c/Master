@@ -20,8 +20,8 @@
 #include <TGraphErrors.h>
 #include <TF1.h>
 
-#define SIPM_COM "/dev/ttyUSB0"
-#define KEITHLEY_COM "/dev/ttyUSB1"
+#define SIPM_COM "/dev/ttyUSB3"
+#define KEITHLEY_COM "/dev/ttyUSB2"
 
 using namespace std;
 
@@ -154,24 +154,14 @@ int main(int argc, char** argv){
 		 * 	by 0.005 by the MPPC_D class
 		 */
 
-		if (iStep != 0 ){
-			cur_DAC = start_DAC + DAC_per_step*iStep;
-		} else {
-			cur_DAC = 0;	// for precise offset measurement
-		}
-
+		cur_DAC = start_DAC + DAC_per_step*iStep;
 		if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(cur_DAC*0.001);
 		if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(cur_DAC*0.001);
 		printf("[DAC Cal] - DAC %i\r", cur_DAC);
 
-		for (int iMeas = 0; iMeas < (nMeas+1); iMeas++){	// nMeas+1; iMeas=0 is ignored
-			// voltage in mV		
+		for (int iMeas = 0; iMeas < nMeas; iMeas++){
+			// voltage in mV
 			voltage = 1000.*source_meter.getVoltageReading();
-			// Source meter needs time to adjust
-			if ( (iMeas == 0) ){	
-				sleep(1);
-				continue;
-			}
 			mean_voltage += voltage;
 			mean_voltage2 += pow(voltage, 2);
 			out_tree->Fill();

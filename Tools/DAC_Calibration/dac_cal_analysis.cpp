@@ -1,5 +1,5 @@
-
 #include <stdio.h>
+#include <cmath>
 // root
 #include <TSystem.h>
 #include <TFile.h>
@@ -90,8 +90,8 @@ int main(int argc, char** argv){
 
 		// fill taken data into corresponding histos/graphs
 		volt_rms_histo->Fill(volt_rms);
-		gr_dac_vs_volt->SetPoint(iStep, dac_counts, volt_mean/1000.);	// plot in V, not mV
-		gr_dac_vs_volt->SetPointError(iStep, 0., volt_rms/1000.);
+		gr_dac_vs_volt->SetPoint(iStep, dac_counts, volt_mean);
+		gr_dac_vs_volt->SetPointError(iStep, 0., volt_rms/sqrt(nMeas));
 
 		// write out..
 		volt_histo->Write();
@@ -103,8 +103,8 @@ int main(int argc, char** argv){
 	for (int i = 0; i < nSteps; i++){
 		in_tree->GetEntry(i*nMeas + 1);
 		res = gr_dac_vs_volt->GetY()[i] - lin_fit->Eval(dac_counts);
-		gr_residuals->SetPoint(i, dac_counts, res*1000.);
-		gr_residuals->SetPointError(i, 0., gr_dac_vs_volt->GetErrorY(i)*1000.);	// plot in mV..
+		gr_residuals->SetPoint(i, dac_counts, res);
+		gr_residuals->SetPointError(i, 0., gr_dac_vs_volt->GetErrorY(i));	// plot in mV..
 	}	
 
 	TCanvas* c1 = new TCanvas();
