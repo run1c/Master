@@ -12,7 +12,13 @@
 #include <rs232/RWTH/SiPM/rs232_SiPM.h>
 #include <rs232/RWTH/SiPM/MPPC_D/MPPC_D.h>
 
-#define USB "/dev/ttyUSB1"
+#define USB "/dev/ttyUSB0"
+
+// colours
+
+#define PRED  "\x1B[31m"	// print red
+#define PGRN  "\x1B[32m"	// print green	
+#define PNRM  "\x1B[0m"		// print normal
 
 using namespace std;
 
@@ -88,17 +94,17 @@ int main(int argc, char** argv){
 			ex_time[cmd] = stop.tv_sec - start.tv_sec + 1e-6*(stop.tv_usec - start.tv_usec);
 			avg_ex_time[cmd] += ex_time[cmd];
 
-			printf("%i - Success on '%s' - ret=%2.3f after %1.4fs...\n", i, cmd_map[cmd].c_str(), dummy, ex_time[cmd]);
+			printf("%i - " PGRN "Success on '%s'" PNRM " - ret=%2.3f after %1.4fs...\n", i, cmd_map[cmd].c_str(), dummy, ex_time[cmd]);
 		} catch (llbad_SiPM_interface &ex) {
-			printf("%i - Error on %s - ret=%2.3f after '%s'\n", i, cmd_map[cmd].c_str(), dummy, ex.what());
+			printf("%i - " PRED "Error on %s" PNRM " - ret=%2.3f after '%s'\n", i, cmd_map[cmd].c_str(), dummy, ex.what());
 			err_log << err << " Error on " << cmd_map[cmd] << " after " << last_cmd << " '" << ex.what() << "'" << endl;
 			err++;
 		} catch (llbad_MPPC_D &ex) {
-			printf("%i - Error on %s - ret=%2.3f after '%s'\n", i, cmd_map[cmd].c_str(), dummy, ex.what());
+			printf("%i - " PRED "Error on %s" PNRM " - ret=%2.3f after '%s'\n", i, cmd_map[cmd].c_str(), dummy, ex.what());
 			err_log << err << " Error on " << cmd_map[cmd] << " after " << last_cmd << " '" << ex.what() << "'" << endl;
 			err++;
 		} catch (...) {
-			printf("%i - Unknown error on %s\n", i, cmd_map[cmd].c_str());
+			printf("%i - " PRED "Unknown error on %s" PNRM "\n", i, cmd_map[cmd].c_str());
 			err_log << err << " Unknown error on " << cmd_map[cmd] << " after " << last_cmd << endl;
 			err++;
 		}
