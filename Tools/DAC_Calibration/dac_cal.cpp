@@ -20,7 +20,7 @@
 #include <TGraphErrors.h>
 #include <TF1.h>
 
-#define SIPM_COM "/dev/ttyUSB1"
+#define SIPM_COM "/dev/ttyUSB3"
 #define KEITHLEY_COM "/dev/ttyUSB2"
 
 using namespace std;
