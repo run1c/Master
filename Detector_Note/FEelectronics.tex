@@ -8,7 +8,7 @@
 	\footnote{Corresponding author: Lars Steffen Weinstock, BSc.}
 	\label{sec:FEelectronics}
 
-This chapter serves as a technical documentation of the electronics currently in use and under development for MTT.
+This chapter serves as a technical documentation of the electronics currently in use and under development for MTT. The current prototype modules are equipped with the S10362-C SiPM series with different pixel sizes produced by Hamamatsu. 
 
 \subsection{Avalanche Photodiode Power Interface}
 
@@ -66,34 +66,33 @@ bits of data per frame, no parity bit, and one stop bit to maximize data through
 			\hline
 			Command & Description & Example \\
 			\hline
-			"A" or "B" & Read temperature adjusted bias voltage of SiPM A or B. Ranges from $0x0000..0x3FFF$ in counts of $5\,\text{mV}$. & Send: "A"
-			\newline Receive: "A1234\textbackslash r\textbackslash n*"\\
+			"A" or "B" & Read temperature adjusted bias voltage of SiPM A or B. Ranges from \verb|0x0000..0x3FFF| in counts of $5\,\text{mV}$. & Send: \verb|"A"|
+			\newline Receive: \verb|"A1234\r\n*"|\\
 			\hline
-			"D" or "E" & Set bias voltage at $25\,^{\circ} \text{C}$ for SiPM A or B. Ranges from $0x0000..0x3FFF$ in counts of $5\,\text{mV}$. Changes are only 
-			temporary and will be lost after reset.& Send: "D1234"\newline Receive: "D1234\textbackslash r\textbackslash n*"\\
+			"D" or "E" & Set bias voltage at $25\,^{\circ} \text{C}$ for SiPM A or B. Ranges from \verb|0x0000..0x3FFF| in counts of $5\,\text{mV}$. Changes are only temporary and will be lost after reset.& Send: \verb|"D1234"|\newline Receive: \verb|"D1234\r\n*"|\\
 			\hline
-			"I" & Read temperature in $^{\circ}\text{C}$. & Send: "I" \newline Receive: "I23.567\textbackslash r\textbackslash n*" \\
+			"I" & Read temperature in $^{\circ}\text{C}$. & Send: \verb|"I"| \newline Receive: \verb|"I23.567\r\n*"| \\
 			\hline
-			"J" & Read raw temperature in ADC counts. Ranges from $0x000..0x3FF$. Used for calibration only. & Send: "J" \newline Receive: "J234\textbackslash r\textbackslash n*" \\
+			"J" & Read raw temperature in ADC counts. Ranges from \verb|0x000..0x3FF|. Used for calibration only. & Send: \verb|"J"| \newline Receive: \verb|"J234\r\n*"|\\
 			\hline
-			"C" & Read temperature coefficient. Ranges from $0x00..0x7F$ in counts of $1\,\frac{\text{mV}}{\text{K}}$. & Send: "C" 
-			\newline Receive: "C39\textbackslash r\textbackslash n*" \\
+			"C" & Read temperature coefficient. Ranges from \verb|0x00..0x7F| in counts of $1\,\frac{\text{mV}}{\text{K}}$. & Send: \verb|"C"| 
+			\newline Receive: \verb|"C39\r\n*"| \\
 			\hline
-			"F" & Set temperature coefficient. Ranges from $0x00..0x7F$ in counts of $1\,\frac{\text{mV}}{\text{K}}$. Changes are only temporary and 
-			will be lost after reset. & Send: "F10" \newline Receive: "F10\textbackslash r\textbackslash n*" \\
+			"F" & Set temperature coefficient. Ranges from \verb|0x00..0x7F| in counts of $1\,\frac{\text{mV}}{\text{K}}$. Changes are only temporary and 
+			will be lost after reset. & Send: \verb|F10| \newline Receive: \verb|"F10\r\n*"| \\
 			\hline
-			"H" & Prints hard- and firmware version of the module. & Send: "H" \newline Receive: "HHW Version 2.1 SW Version 2.0\textbackslash r\textbackslash n*" \\
+			"H" & Prints hard- and firmware version of the module. & Send: \verb|"H"| \newline Receive: \verb|"HHW Version 2.1 SW Version 2.0\r\n*"| \\
 			\hline
-			"S" & Prints serial number and default bias at $25\,^{\circ} \text{C}$ in counts of $5\, \text{mV}$ of all SiPMs on the module. &  Send: "S" 
-			\newline Receive: "S Sensor A No.: 3H000004 Voltage:3567 Sensor B No.: 3H000005 Voltage:3565\textbackslash r\textbackslash n*" \\
+			"S" & Prints serial number and default bias at $25\,^{\circ} \text{C}$ in counts of $5\, \text{mV}$ of all SiPMs on the module. &  Send: \verb|"S"| 
+			\newline Receive: \verb|"S Sensor A No.: 3H000004 Voltage:3567 Sensor B No.: 3H000005 Voltage:3565\r\n*"| \\
 			\hline
-			"Q" & Switch module to DAC calibration mode. & Send: "Q" \newline Receive: "Q\textbackslash r\textbackslash n*" \\
+			"Q" & Switch module to DAC calibration mode. & Send: \verb|"Q"| \newline Receive: \verb|"Q\r\n*"| \\
 			\hline
 			\end{tabular}
 		\end{center}
 		\caption{Overview of all commands supported by firmware version $<2.0$. Note that modules with only one SiPM neither support command "B" nor "E".}
 		\label{sipm_bus_table}
-	\end{table}
+	\end{table}	
 
 \subsection{Multi Pixel Photon Counter Duo Controller}
 
@@ -156,15 +155,11 @@ $R_7$ provides the previously discussed current feedback to the Pt100 resistor d
 
 The output voltage of the temperature probe is measured by a $10$ bit ADC on the microcontroller. Internally, the temperature then is calculated by the following equation:
 \begin{equation}
-	T[^{\circ}C] = TGain[^{\circ}\text{C/ADCcount}] \times ADCcount + TOffset[^{\circ}\text{C}]
+	T[^{\circ}C] = TGain[^{\circ}\text{C/ADCcount}] \times ADCcount + TOffset[^{\circ}\text{C}] 	
 \end{equation}
 The calibration of the temperature probe can be done by simply exposing the probe to a well regulated temperature and reading its ADC register. The $10$ bit ADC of the microcontroller
 can be read out with the command "J". For a fast temperature calibration one also can use a Pt100 simulator. This simulator is a potentiometer that can be set to a certain 
 temperature value and outputs the corresponding resistance of a Pt100 resistor at the given temperature value. The device and the connection to the MPPC D is shown in Fig. \ref{fig:pt100_sim}.
-
-\subsubsection*{Results of temperature probe calibration}
-
-
 
 \newpage
 
@@ -198,17 +193,40 @@ PWM signal:
 	\end{equation}
 
 \subsubsection*{Bias voltage regulator calibration}
-The output voltage of the MAX5136 DAC is set by accessing the output registers DACn Register (DACnR) where $n=1,2$ for the corresponding SiPM. These registers can be set to any value between \verb|0x0000| .. \verb|0xFFFF| setting the output to $0\, \text{V}..2.44\, \text{V}$ respectively. To get the precise conversion from DAC counts to output bias voltage, one must perform a calibration of the DACs. Internally the value written to DACnR set by the following calculation:
+
+The output voltage of the MAX5136 DAC is set by accessing the output registers DACn Register (DACnR) where $n=A,B$ for the corresponding SiPM. These registers can be set to any value between \verb|0x0000| .. \verb|0xFFFF| setting the output to $0\, \text{V}..2.44\, \text{V}$ respectively. To get the precise conversion from DAC counts to output bias voltage, one must perform a calibration of the DACs. Internally the value written to DACnR is set by the following calculation:
 	\begin{eqnarray}
-		DACnR &=&  \frac{(U_{n,adj} - DACOff)}{DACGain} \\
-		U_{n,adj} &=& \frac{\Delta U_{bias}}{\Delta T}(T - 25\,^{\circ} \text{C}) + U_{adj}(25\,^{\circ} \text{C}),
+		DACnR &=&  \frac{(U_{n,adj} - DACOffset_{n})}{DACGain_{n}} \\
+		U_{n,adj} &=& \frac{\Delta U_{bias}}{\Delta T}(T - 25\,^{\circ} \text{C}) + U_{n,adj}(25\,^{\circ} \text{C}),
 	\end{eqnarray} 
 where $U_{n,adj}$ is the temperature adjusted bias voltage for SiPM n and $\frac{\Delta U_{bias}}{\Delta T} = 56\,\frac{\text{mV}}{\text{K}}$. 
 
-To calibrate the DAC, the module has to be set to DAC calibration mode by issuing the command "Q". In calibration mode $DACOffset$ and $\frac{\Delta U}{\Delta T}$ 
-are set to $0$ and $DACGain$ to $1$ thus disabling the temperature correction. Also one can now access DACnR directly by setting the bias voltage 
-at $25^{\circ} \text{C}$ with the command \verb|"Dhhhh"| or \verb|"Ehhhh"| to the hex value $5\times\verb|0xhhhh|$. By setting the DAC output registers to a given value and then measuring the 
-output adjusted bias voltage one can easily perform a calibration.
+To calibrate the DAC, the module has to be set to DAC calibration mode by issuing the command "Q". In calibration mode $DACOffset_{n}$ and $\frac{\Delta U_{bias}}{\Delta T}$ 
+are set to $0$ and $DACGain_{n}$ to $1$ thus disabling the temperature correction. Also one can now access DACnR directly by setting the bias voltage 
+at $25^{\circ} \text{C}$ with the command \verb|"Dhhhh"| or \verb|"Ehhhh"| to the hex value $5\times\verb|0xhhhh|$. By setting the DAC output registers to a given value and then measuring the output adjusted bias voltage one can easily perform a calibration.
+
+The result of such a calibration is shown in Fig. \ref{fig:dac_cal} for both bias voltage regulators on one MPPC D. Each single point is the mean value of $100$ voltage measurements at a given DAC count as shown in Fig. \ref{fig:dac_cal_point}. As one can easily see, the output voltage is linear with respect to the contents of DACnR. Also the residuals hold no systematic deviations over a range of $10,000$ DAC counts. For this MPPC D it holds:
+\begin{eqnarray}
+	DACGain_{A} &=& (1.27513\pm0.000010)\frac{\text{mV}}{\text{count}} \nonumber \\
+	DACOffset_{A} &=& (89.2\pm1.7)\,\text{mV} \nonumber \\
+	DACGain_{B} &=& (1.27473\pm0.000011)\frac{\text{mV}}{\text{count}} \nonumber \\
+	DACOffset_{B} &=& (92.15\pm0.59)\,\text{mV} \nonumber
+\end{eqnarray}
+
+	\begin{figure}[t]
+		\centering
+			\includegraphics[width=\textwidth]{Figures/weinstock/dac_cal_A.pdf}
+			\includegraphics[width=\textwidth]{Figures/weinstock/dac_cal_B.pdf}
+		\caption{Results of the bias voltage regulator calibration. The upper picture shows the result for regulator A, the lower one for regulator B.}
+		\label{fig:dac_cal}
+	\end{figure}
+	
+	\begin{figure}[t]
+		\centering
+			\includegraphics[width=\textwidth]{Figures/weinstock/dac_cal_point.pdf}
+		\caption{Distribution of measured bias voltage of voltage regulator B at $DACnR=56,000$. The mean values and their errors of these histograms are used for the calibration plots.}
+		\label{fig:dac_cal_point}
+	\end{figure}	
 
 \subsubsection{Amplifier circuits}
 

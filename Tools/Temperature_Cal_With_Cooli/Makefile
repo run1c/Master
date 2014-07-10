@@ -28,7 +28,7 @@ $(BIN): $(BIN).o $(OBJ)
 	$(CC) $^ -o $@ $(LDFLAGS) $(CFLAGS)
 
 $(BIN2): $(BIN2).o
-	$(CC) $^ -o $@ $(CFLAGS)
+	$(CC) $^ -o $@ $(ROOTGLIBS) $(CFLAGS)
 
 clean:
 	rm -f *.o
