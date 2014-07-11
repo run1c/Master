@@ -3,6 +3,7 @@
 volatile uint8_t __tick = 0;		// tick counts the number of overflow interrupts
 volatile int __milliseconds = 0;	// number of milliseconds
 
+
 void timer_init(void){
 
 	/*
@@ -24,10 +25,10 @@ void timer_init(void){
 	TCCR1B = (1 << WGM12) | (1 << WGM13);
 	TCCR1B |= (1 << CS10) | (1 << CS11);	// prescaler 64 
 
-	TCTN1 = 0x0000;
+	TCNT1 = 0x0000;
 	
 	OCR1A = 0x00FF;	// sets the duty cycle of the signal
-	IRC1 = 0x0FFF;	// sets the period
+	ICR1 = 0x0FFF;	// sets the period
 
 	return;
 }

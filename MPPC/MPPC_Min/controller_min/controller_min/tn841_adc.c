@@ -17,7 +17,7 @@ void ADC_init(void){
 	// set adc clock prescaler to 64
 	ADCSRA = (1 << ADPS2) | (1 << ADPS1);
 	// enable adc
-	ADCSRA |= (1 << ADEN);
+	ADCSRA |= (1 << ADEN );
 	return;	
 };
 

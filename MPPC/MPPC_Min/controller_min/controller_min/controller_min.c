@@ -13,8 +13,8 @@
 
 #define ENA_PORT PORTA
 #define ENA_DDR DDRA
-#define ENA_LED PORTA0
-#define ENA_PIN PORTA3
+//#define ENA_LED PORTA0
+#define ENA_PIN PORTA0
 
 // commands
 #define READ_TEMP 'I'
@@ -63,11 +63,11 @@ int main(void)
 	timer_init();
 	USART_init();
 	ADC_init();
-	sei();
+	sei(); 
 	
 	// set up enable port
-	DDRA = (1 << ENA_LED) | (1 << ENA_PIN);
-	ENA_PORT = (1 << ENA_LED);
+	ENA_DDR = /*(1 << ENA_LED) |*/ (1 << ENA_PIN);
+//	ENA_PORT = (1 << ENA_LED);
 	
 	// init condition is receiving
 	driverReceive();
@@ -122,7 +122,7 @@ int main(void)
 					MPPC_status = ADDRESSED;
 					// SEL_LED on -> module has been selected + echo
 					sendString(str_buf);
-					ENA_PORT&= ~(1 << ENA_LED);
+//					ENA_PORT&= ~(1 << ENA_LED);
 					// echo in ASCII
 				} else {
 					MPPC_status = IDLE;
@@ -134,7 +134,7 @@ int main(void)
 				case ADDRESSED:
 				if (read_buf == '>'){	// stop delimiter
 					MPPC_status = IDLE;
-					ENA_PORT |= (1 << ENA_LED);	// SEL_LED off -> module has been deselected
+//					ENA_PORT |= (1 << ENA_LED);	// SEL_LED off -> module has been deselected
 				} else {
 					command_handler(read_buf);	// yet another switch/case stucture...
 				}
