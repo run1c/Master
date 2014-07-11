@@ -38,7 +38,7 @@ int main(int argc, char** argv){
 
 	stringstream ssbuf;
 	int nSamples = tree->GetEntries();
-	float pulse_height, width = 0.01, min_height;
+	float pulse_height, width = 0.01, min_height = 0.;
 	float* mean = new float[nMax];
 	float* sigma = new float[nMax];
 	float* mean_err = new float[nMax];
