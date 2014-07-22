@@ -51,7 +51,7 @@ int main(int argc, char** argv){
 
 	float volt_mean, volt_rms;
 	TGraphErrors* gr_dac_vs_volt = new TGraphErrors();
-	gr_dac_vs_volt->SetTitle("output voltage vs. DAC counts;DAC [counts];U_{out} [V]");
+	gr_dac_vs_volt->SetTitle("output voltage vs. DAC counts;DAC [counts];U_{out} [mV]");
 	gr_dac_vs_volt->GetYaxis()->SetTitleOffset(1.55);
 	gr_dac_vs_volt->SetLineColor(35);
 	gr_dac_vs_volt->SetMarkerStyle(7);

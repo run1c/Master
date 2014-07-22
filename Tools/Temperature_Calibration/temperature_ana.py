@@ -38,6 +38,8 @@ gr_res = ROOT.TGraphErrors()
 gr_res.SetTitle("Residuals;ADC [count];T_{sim} - T_{fit} [#circC]")
 gr_res.SetMarkerStyle(7)
 
+h_dac = ROOT.TH1F();
+
 fit = ROOT.TF1("fit", "[0] + [1]*x")
 fit.SetParNames("TOffset [#circC]", "TGain [#circC/count]")
 zero = ROOT.TF1("zero", "0", -1000, 100000)
@@ -47,6 +49,7 @@ adc_rms_list = []
 temperature_list = []
 
 for iStep in range(nSteps):
+	h_dac.Reset();
 	adc_mean = 0.
 	adc_mean2 = 0.
 	for iMeas in range(nMeas):
