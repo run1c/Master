@@ -14,6 +14,11 @@
 #include <TTree.h>
 #include <TFile.h>
 
+// colours
+#define PRED  "\x1B[31m"	// print red
+#define PGRN  "\x1B[32m"	// print green	
+#define PNRM  "\x1B[0m"		// print normal
+
 using namespace std;
 
 #define VERBOSE
@@ -40,7 +45,7 @@ int main(int argc, char** argv){
 	} 
 
 	// serial port setup
-	linux_rs232 com("/dev/ttyUSB3", 38400);
+	linux_rs232 com("/dev/ttyUSB0", 38400);
 	TDS3000 scope(&com);
 
 	printf("[Gain Measurement] - Init scope..\n");
@@ -78,12 +83,20 @@ int main(int argc, char** argv){
 	int iSample = 0, rejects = 0;
 	while (iSample < nSamples){
 		h_pulse->Reset();
+#ifdef VERBOSE
+		printf("[Gain Measurement] - Reading scope... ");
+#endif
 		len = scope.getWaveformReading(t, u);
+#ifdef VERBOSE
+		printf("DONE\n");
+#endif
 		usleep(1e5);
 		// fill histo
 		for (int i = 0; i < len; i++)
-			h_pulse->Fill(t[i], -1*u[i]);	
+			h_pulse->Fill(t[i], -1*u[i]);
+#ifndef VERBOSE	
 		cout << "[Gain Measurement] - Progress " << iSample << "/" << nSamples << "\t\r" << flush;
+#endif
 		// calculate baseline
 		baseline = getBaseline(h_pulse, t_min, 0, slope, offset);
 		// reject if baseline too steep
@@ -99,10 +112,11 @@ int main(int argc, char** argv){
 		// save
 		out_tree->Fill();
 #ifdef VERBOSE
-		printf("[Gain Measurement] - # SAMPLE %i # \n", iSample);
-		printf("[Gain Measurement] - baseline = %fV\n", baseline);
-		printf("[Gain Measurement] - pulse height = %fV\n", pulse_height);
+		printf("[Gain Measurement] - " PGRN "# SAMPLE %i/%i #" PNRM "\n", iSample, nSamples);
+		printf("[Gain Measurement] -\tbaseline = %fV\n", baseline);
+		printf("[Gain Measurement] -\tpulse height = %fV\n", pulse_height);
 		h_pulse->Write();
+		printf("[Gain Measurement] -\tHisto written...\n", pulse_height);
 #endif
 	}
 	printf("[Gain Measurement] - Done -  rejected %i samples (eff. %2.1f%).\n", rejects, 100.*(float)iSample/(float)(rejects + iSample) );
