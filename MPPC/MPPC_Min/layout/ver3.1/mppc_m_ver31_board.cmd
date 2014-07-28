@@ -167,8 +167,8 @@ ChangePinName(C7, 1, 1)
 
 # Start of element U1
 ChangePinName(U1, 2, OUT)
-ChangePinName(U1, 3, VCC)
-ChangePinName(U1, 1, GND)
+ChangePinName(U1, 1, VCC)
+ChangePinName(U1, 3, GND)
 
 # Start of element C6
 ChangePinName(C6, 2, 2)
