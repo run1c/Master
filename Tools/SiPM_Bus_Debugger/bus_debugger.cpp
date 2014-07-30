@@ -54,6 +54,7 @@ int main(int argc, char** argv){
 				"set dU/dT"};
 	int err = 0, cmd = 0, last_cmd = 0, nCmd[7];
 	struct timeval start, stop;	// for time logging
+	bool retry = false;
 	// error logging
 	stringstream sName;
 	sName << "log_" << time(0) << ".txt";
@@ -61,43 +62,52 @@ int main(int argc, char** argv){
 	err_log << "---- " << sName.str() << endl;
 	fill_n(nCmd, 7, 0);
 	for (int i = 0; i < nTries; i++){
-		cmd = rand()%7;		// execute a random command 
-		try{
+		// if the command had to be resent due to an exception
+		// use the old starting point
+		if (!retry){ 
 			gettimeofday(&start, NULL);
-			nCmd[cmd]++;
+			cmd = rand()%7;		// execute a random command 
+		}
+		retry = true;	// will be set to false if no exception occurs
+		try{
 			switch (cmd){		
 			// read commands
 			case 0:	
 				dummy = fe.get_temperature_adjusted_voltage_A();
-				downBytes += 9; 	// 1 command 1 echo 4 bytes data 3 eom
+				downBytes += 4; 	// 4 bytes of data 
 				break;
 			case 1:	
 				dummy = fe.get_temperature_adjusted_voltage_B();
-				downBytes += 9; 	// 1 command 1 echo 4 bytes data 3 eom
+				downBytes += 4; 
 				break;
 			case 2:	
 				dummy = fe.get_temperature();
-				downBytes += 12; 	// 1 command 1 echo 7 bytes data 3 eom
+				downBytes += 7; 
 				break;
 			case 3:	
 				dummy = fe.get_progression_coefficient();
-				downBytes += 7; 	// 1 command 1 echo 2 bytes data 3 eom
+				downBytes += 2;
 				break;
 			// write commands
 			case 4: 
 				fe.set_bias_voltage_at_25_degree_A(60.);	
-				upBytes += 13; 	// 1 command 4 bytes data 1+4 echo 3 eom
+				upBytes += 4;
 				break;
 			case 5: 
 				fe.set_bias_voltage_at_25_degree_B(60.);	
-				upBytes += 13; 	// 1 command 4 bytes data 1+4 echo 3 eom
+				upBytes += 4;
 				break;
 			case 6: 
 				fe.set_bias_voltage_progression_coefficient(0.050);	
-				upBytes += 9; 	// 1 command 2 bytes data 1+2 echo 3 eom
+				upBytes += 2;
 				break;
 			}	
+
+			// this section will only be reached if no exception occured
+			retry = false;	
+			nCmd[cmd]++;
 			gettimeofday(&stop, NULL);
+
 			// calc execution time for command
 			ex_time[cmd] = stop.tv_sec - start.tv_sec + 1e-6*(stop.tv_usec - start.tv_usec);
 			avg_ex_time[cmd] += ex_time[cmd];
@@ -116,26 +126,27 @@ int main(int argc, char** argv){
 			err_log << err << " Unknown error on " << cmd_map[cmd] << " after " << last_cmd << endl;
 			err++;
 		}
-
-		last_cmd = cmd;
 	}
 
 	// logging
 	err_log << "---- end" << endl;
 	err_log << "nErrors=" << err << endl;
 	err_log << "nTries=" << nTries << endl;
-
+	
 	printf("Received %i errors.\n", err);
 	printf("Average command execution time:\n");
 	for (int j = 0; j < 7; j++){
 		avg_ex_time[j] /= nCmd[j];
-		printf("\t%s\t%1.4fs\n", cmd_map[j].c_str(), avg_ex_time[j]);
+		printf("\t%s\t%1.4fs (n=%i)\n", cmd_map[j].c_str(), avg_ex_time[j], nCmd[j]);
 		err_log << cmd_map[j] << "\tt=" << avg_ex_time[j] << "\t(nCmd=" << dec << nCmd[j] << ")" << endl;
 	}
-
+	
 	// average up and down data throughput
 	float upStream = upBytes/(ex_time[4] + ex_time[5] + ex_time[6]);
 	float downStream = downBytes/(ex_time[0] + ex_time[1] + ex_time[2] + ex_time[3]);
+
+	printf("\tupStream=%f bytes/s\n\tdownStream=%f bytes/s\n", upStream, downStream);
+
 	err_log.close();	
 	return 0;
 }
