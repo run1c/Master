@@ -26,6 +26,7 @@ int main(int argc, char** argv){
 	uint16_t fe_addr = 0xFF;
 	char* dev_file;
 	int nTries = 0;
+	int upBytes = 0, downBytes = 0;
 	stringstream ssBuf;
 
 	if (argc != 4){
@@ -68,25 +69,32 @@ int main(int argc, char** argv){
 			// read commands
 			case 0:	
 				dummy = fe.get_temperature_adjusted_voltage_A();
+				downBytes += 9; 	// 1 command 1 echo 4 bytes data 3 eom
 				break;
 			case 1:	
 				dummy = fe.get_temperature_adjusted_voltage_B();
+				downBytes += 9; 	// 1 command 1 echo 4 bytes data 3 eom
 				break;
 			case 2:	
 				dummy = fe.get_temperature();
+				downBytes += 12; 	// 1 command 1 echo 7 bytes data 3 eom
 				break;
 			case 3:	
 				dummy = fe.get_progression_coefficient();
+				downBytes += 7; 	// 1 command 1 echo 2 bytes data 3 eom
 				break;
 			// write commands
 			case 4: 
 				fe.set_bias_voltage_at_25_degree_A(60.);	
+				upBytes += 13; 	// 1 command 4 bytes data 1+4 echo 3 eom
 				break;
 			case 5: 
 				fe.set_bias_voltage_at_25_degree_B(60.);	
+				upBytes += 13; 	// 1 command 4 bytes data 1+4 echo 3 eom
 				break;
 			case 6: 
 				fe.set_bias_voltage_progression_coefficient(0.050);	
+				upBytes += 9; 	// 1 command 2 bytes data 1+2 echo 3 eom
 				break;
 			}	
 			gettimeofday(&stop, NULL);
@@ -124,6 +132,10 @@ int main(int argc, char** argv){
 		printf("\t%s\t%1.4fs\n", cmd_map[j].c_str(), avg_ex_time[j]);
 		err_log << cmd_map[j] << "\tt=" << avg_ex_time[j] << "\t(nCmd=" << dec << nCmd[j] << ")" << endl;
 	}
+
+	// average up and down data throughput
+	float upStream = upBytes/(ex_time[4] + ex_time[5] + ex_time[6]);
+	float downStream = downBytes/(ex_time[0] + ex_time[1] + ex_time[2] + ex_time[3]);
 	err_log.close();	
 	return 0;
 }
