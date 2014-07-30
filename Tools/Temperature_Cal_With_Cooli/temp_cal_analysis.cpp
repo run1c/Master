@@ -59,13 +59,19 @@ int main(int argc, char** argv){
 	float diff_min = 999, diff_max = 0;
 	TGraphErrors* t_pt100 = new TGraphErrors();
 	t_pt100->SetLineColor(35);
+	t_pt100->SetMarkerColor(35);
+	t_pt100->SetMarkerStyle(7);
 	TGraphErrors* t_cooli = new TGraphErrors();
 	t_cooli->SetLineColor(46);
+	t_cooli->SetMarkerColor(46);
+	t_cooli->SetMarkerStyle(7);
 	TGraphErrors* t_diff = new TGraphErrors();
 	t_diff->SetLineColor(30);
+	t_diff->SetMarkerColor(30);
+	t_diff->SetMarkerStyle(7);
 	TMultiGraph* mg = new TMultiGraph();
 	mg->SetTitle("Temperature Progression;t [s];T[#circC]");
-	TLegend* leg = new TLegend(0.1, 0.1, 0.2, 0.2, "");
+	TLegend* leg = new TLegend(0.1, 0.7, 0.3, 0.9, "");
 	
 	printf("[Temperature Analysis]\tstep\tpt100\trms\tcooli\trms\tdiff\trms\n");
 	printf("[Temperature Analysis]\t==================================================\n");

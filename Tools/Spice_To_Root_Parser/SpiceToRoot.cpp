@@ -42,7 +42,10 @@ int main(int argc, char** argv){
 
 	do {
 		infile >> line;	// first entry of a line is the column number; not needed
-		if (!infile.good()) break;
+		if (!infile.good()){ 
+			printf("Done!\n");
+			break;
+		}
 		printf("[Spice to root] - line %i\t", line);
 		for (int iCol = 0; iCol < nCols; iCol++){
 			infile >> var[iCol];	
@@ -53,6 +56,7 @@ int main(int argc, char** argv){
 	} while ( infile.good() );
 
 	outfile->Write();
-
+	infile.close();
+	outfile->Close();
 	return 0;
 }
