@@ -14,6 +14,8 @@
 
 #define USB "/dev/ttyUSB0"
 
+#define BAUD 9600
+
 // colours
 
 #define PRED  "\x1B[31m"	// print red
@@ -26,7 +28,6 @@ int main(int argc, char** argv){
 	uint16_t fe_addr = 0xFF;
 	char* dev_file;
 	int nTries = 0;
-	int upBytes = 0, downBytes = 0;
 	stringstream ssBuf;
 
 	if (argc != 4){
@@ -40,8 +41,8 @@ int main(int argc, char** argv){
 	}
 
 	// setup communication with frontend board
-	linux_rs232 usb(dev_file, 9600);
-	rs232_SiPM sipm(&usb, 9600);
+	linux_rs232 usb(dev_file, BAUD);
+	rs232_SiPM sipm(&usb, BAUD);
 	MPPC_D fe(&sipm, fe_addr);
 
 	double dummy = .0, ex_time[7], avg_ex_time[7];
@@ -74,32 +75,25 @@ int main(int argc, char** argv){
 			// read commands
 			case 0:	
 				dummy = fe.get_temperature_adjusted_voltage_A();
-				downBytes += 4; 	// 4 bytes of data 
 				break;
 			case 1:	
 				dummy = fe.get_temperature_adjusted_voltage_B();
-				downBytes += 4; 
 				break;
 			case 2:	
 				dummy = fe.get_temperature();
-				downBytes += 7; 
 				break;
 			case 3:	
 				dummy = fe.get_progression_coefficient();
-				downBytes += 2;
 				break;
 			// write commands
 			case 4: 
 				fe.set_bias_voltage_at_25_degree_A(60.);	
-				upBytes += 4;
 				break;
 			case 5: 
 				fe.set_bias_voltage_at_25_degree_B(60.);	
-				upBytes += 4;
 				break;
 			case 6: 
 				fe.set_bias_voltage_progression_coefficient(0.050);	
-				upBytes += 2;
 				break;
 			}	
 
@@ -142,8 +136,8 @@ int main(int argc, char** argv){
 	}
 	
 	// average up and down data throughput
-	float upStream = upBytes/(ex_time[4] + ex_time[5] + ex_time[6]);
-	float downStream = downBytes/(ex_time[0] + ex_time[1] + ex_time[2] + ex_time[3]);
+	float upStream = 4./avg_ex_time[4] + 4./avg_ex_time[5] + 2./avg_ex_time[6];
+	float downStream = 4./avg_ex_time[0] + 4./avg_ex_time[1] + 7./avg_ex_time[2] + 2./avg_ex_time[3];
 
 	printf("\tupStream=%f bytes/s\n\tdownStream=%f bytes/s\n", upStream, downStream);
 
