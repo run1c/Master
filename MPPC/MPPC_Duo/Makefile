@@ -29,6 +29,9 @@ program: $(BIN).hex
 eeprom: $(BIN).eep
 	avrdude -p m88p -P usb -c avrispmkII -U eeprom:w:$(BIN).eep
 
+read:
+	avrdude -p m88p -P usb -c avrispmkII -U lfuse:r:-:h -U hfuse:r:-:h -U efuse:r:-:h -U lock:r:-:h
+
 clean: 
 	rm -rf $(OBJ) 
 	rm -rf $(BIN).elf 
