@@ -12,12 +12,12 @@ LIBLAB=$(HOME)/liblab/
 LIBSUB=$(HOME)/sdvlp/subsystem/
 
 ## makefile settings for my setup
-CFLAGS=-Wall $(ROOTCFLAGS) -I$(LIBLAB) -I$(LIBSUB)
-LDFLAGS=-L$(LIBLAB) -L$(LIBSUB) $(ROOTGLIBS) -llab -lsubsystem
+#CFLAGS=-Wall $(ROOTCFLAGS) -I$(LIBLAB) -I$(LIBSUB)
+#LDFLAGS=-L$(LIBLAB) -L$(LIBSUB) $(ROOTGLIBS) -llab -lsubsystem
 
 ## makefile settings on sipm01
-#CFLAGS=-Wall $(ROOTCFLAGS) -I$(HOME)/include/liblab/ -I$(HOME)/include/subsystem/
-#LDFLAGS=-L$(HOME)/lib/ $(ROOTGLIBS) -llab -lsubsystem
+CFLAGS=-Wall $(ROOTCFLAGS) -I$(HOME)/include/liblab/ -I$(HOME)/include/subsystem/
+LDFLAGS=-L$(HOME)/lib/ $(ROOTGLIBS) -llab -lsubsystem
 
 all: $(BIN) $(BIN2)
 

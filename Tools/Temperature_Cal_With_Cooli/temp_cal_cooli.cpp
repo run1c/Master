@@ -86,7 +86,7 @@ int main(int argc, char** argv){
 
 	CooliHandler cooli;
 
-	for (int iStep = 0; iStep < nSteps; iStep++){
+	for (int iStep = 0; iStep < nSteps+1; iStep++){
 		mean_adc = 0.;
 		mean_adc2 = 0.;
 		cur_temp = tStart + temp_per_step*iStep;
@@ -100,7 +100,7 @@ int main(int argc, char** argv){
 		// wait for setting...
 		while (!cooli.isReady(ssbuf.str())){ 
 			printf("[Temp Cal] - Waiting for cooli to set %sdegC (cooli@%.2f/fe@%.2f)\n", ssbuf.str().c_str(), cooli.getTemperature(), fe.get_temperature());
-			sleep(60); 
+			sleep(300); 
 		};	
 	#endif
 		// take measurements
@@ -109,10 +109,12 @@ int main(int argc, char** argv){
 			// retry if cooli is not stable
 			if ( !cooli.isReady( ssbuf.str() ) ){
 				iMeas--;
-				printf("[Temp Cal] - Waiting to stabilize again.\n");
+				printf("[Temp Cal] - Waiting to stabilize again to %fdegC (cooli@%.2f/fe@%.2f).\n", cur_temp, cooli.getTemperature(), fe.get_temperature());
+				sleep(30);
 				continue;
 			}
-			cooli_temp = cooli.getTemperature();
+			// take one cooli temperature measurement every 10 steps (takes quite long...)
+			if (iMeas%10 == 0) cooli_temp = cooli.getTemperature();
 		#endif
 			// get ALL the temperatures
 			adc_count = fe.get_temperature_raw();
