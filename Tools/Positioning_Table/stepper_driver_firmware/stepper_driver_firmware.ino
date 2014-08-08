@@ -2,17 +2,28 @@
 #include <Wire.h>
 #include "utility/Adafruit_PWMServoDriver.h"
 
-#define MOVE 'm'
-#define HOLD 'h'
-#define RELEASE 'r'
+// commands
+#define MOVE 	'm'
+#define HOLD 	'h'
+#define RELEAS 	'r'
 #define GET_POS 'p'
 #define SET_POS 's'
 
-#define CMD_DELIMITER ':'
-#define CMD_ERROR '?'
-#define EOM "*\n"
+#define CMD_DELIMITER 	':'
+#define CMD_ERROR 	'?'
+#define EOM 		"*\n"
 
-#define STEPPER_SPEED 50
+// front leds
+#define LED_MOTOR_X  	7
+#define LED_MOTOR_Y  	6
+#define LED_DATA  	8
+#define LED_KILL_X  	4
+#define LED_KILL_MX  	5
+#define LED_KILL_Y  	3  
+#define LED_KILL_MY  	2
+
+#define STEPPER_SPEED 	50
+#define SINGLE_STEP_DELAY 5
 
 // read one byte, but only there is something to be read!
 int readByte(bool echo = true);  
@@ -34,6 +45,7 @@ Adafruit_StepperMotor* stepper1 = motor_shield.getStepper(200, 1);
 Adafruit_StepperMotor* stepper2 = motor_shield.getStepper(200, 2);
 
 bool is_interrupt = false;	// is set when an interrupt happens
+bool stepper_hold = false;	// send current pulses to hold coil position (increases power consumption)
 char cbuf;			// char buffer...
 int nMotor = 0;
 int nSteps = 0;			// stores the no of steps to go
@@ -46,6 +58,15 @@ void setup() {
 	stepper1->setSpeed(STEPPER_SPEED);
 	stepper2->setSpeed(STEPPER_SPEED);
   	flushBuffer();
+  
+        // set up leds
+	pinMode(LED_MOTOR_X, OUTPUT);
+	pinMode(LED_MOTOR_Y, OUTPUT);
+	pinMode(LED_DATA, OUTPUT);
+	pinMode(LED_KILL_X, OUTPUT);
+	pinMode(LED_KILL_MX, OUTPUT);
+	pinMode(LED_KILL_Y, OUTPUT);
+	pinMode(LED_KILL_MY, OUTPUT);
 }
 
 void loop() {
@@ -53,8 +74,10 @@ void loop() {
 	/* 
 	 *	command format ':<motor no><command>[<value>]'
 	 */
+
 	// check if theres data to be read
 	if ( Serial.available() ){
+                digitalWrite(LED_DATA, HIGH);
 		cbuf = Serial.read();
 		if (cbuf == CMD_DELIMITER){
 			// command delimiter has to be followed by a motor number
@@ -70,11 +93,11 @@ void loop() {
 				Serial.print(EOM);
 				break;
 			case HOLD:
-				holdStepper(true);
+				stepper_hold = true;
 			  	Serial.print(EOM);
 			  	break;
-			case RELEASE:
-			  	holdStepper(false);
+			case RELEAS:
+				stepper_hold = false;
 			  	Serial.print(EOM);
 			  	break;
 			case GET_POS:
@@ -89,6 +112,8 @@ void loop() {
 			 	fail: failed();
       			}
     		}
+		// done reading
+                digitalWrite(LED_DATA, LOW);
   	} 
 }
 
@@ -128,7 +153,7 @@ void failed(){
 }
 
 int moveSteps(int iMotor, int iSteps){
-	int dir = 0, mult = 1;
+	int dir = 0, mult = 1, led_pin;
 	Adafruit_StepperMotor* cur_stepper;
 
 	// get direction
@@ -141,23 +166,26 @@ int moveSteps(int iMotor, int iSteps){
 	  	dir = FORWARD;
 	}
 	// get motor
-	if (iMotor == 0) cur_stepper = stepper1;
-	if (iMotor == 1) cur_stepper = stepper2;
+	if (iMotor == 0){ 
+          cur_stepper = stepper1;
+          led_pin = LED_MOTOR_X;
+        }
+	if (iMotor == 1){ 
+          cur_stepper = stepper2;
+          led_pin = LED_MOTOR_Y;
+        }
 
 	// do single steps to count every single step
-	int i; 
+	int i;
+	digitalWrite(led_pin, HIGH); 
 	for (i = 0; i < iSteps; i++){
 	  	cur_stepper->onestep(dir, DOUBLE);
-		delay(10);
+		delay(SINGLE_STEP_DELAY);
 		if (is_interrupt) break;	// if an interrupt happened, stop moving
-		curSteps[iMotor] += 1*mult;
+		curSteps[iMotor] += 1*mult;	// +- 1 step
 	}  
+	digitalWrite(led_pin, LOW); 
+	if (!stepper_hold) cur_stepper->release();
 	// return actual number of steps taken
 	return i*mult;
-}
-
-void holdStepper(bool hold){
-	// TODO: hold & release..
-	// maybe add a bool which is checked, after every movement
-  	return;
 }
