@@ -8,6 +8,7 @@
 #define RELEAS 	'r'
 #define GET_POS 'p'
 #define SET_POS 's'
+#define PC_INT	'i'
 
 #define CMD_DELIMITER 	':'
 #define CMD_ERROR 	'?'
@@ -21,6 +22,13 @@
 #define LED_KILL_MX  	5
 #define LED_KILL_Y  	3  
 #define LED_KILL_MY  	2
+
+// kill switch pins
+#define PIN_KILL	PINB
+#define PIN_KILL_X	PORTB1
+#define PIN_KILL_MX	PORTB2
+#define PIN_KILL_Y	PORTB4
+#define PIN_KILL_MY	PORTB3
 
 #define STEPPER_SPEED 	50
 #define SINGLE_STEP_DELAY 5
@@ -44,12 +52,15 @@ Adafruit_MotorShield motor_shield = Adafruit_MotorShield();
 Adafruit_StepperMotor* stepper1 = motor_shield.getStepper(200, 1);
 Adafruit_StepperMotor* stepper2 = motor_shield.getStepper(200, 2);
 
-bool is_interrupt = false;	// is set when an interrupt happens
-bool stepper_hold = false;	// send current pulses to hold coil position (increases power consumption)
-char cbuf;			// char buffer...
+Adafruit_StepperMotor* cur_stepper;	// current stepper in motion, needed for interrupts 
+bool is_interrupt = false;		// is set when an interrupt happens
+bool stepper_hold = false;		// send current pulses to hold coil position (increases power consumption)
+char cbuf;				// char buffer...
 int nMotor = 0;
-int nSteps = 0;			// stores the no of steps to go
-int curSteps[2] = {0, 0};	// stores current position in steps
+int nSteps = 0;				// stores the no of steps to go
+int curSteps[2] = {0, 0};		// stores current position in steps
+
+uint8_t old_int = 0x00, new_int = 0x00;	// stores status of pin change interrupts
 
 void setup() {
 	// serial communication @ 9600 BAUD
@@ -67,6 +78,9 @@ void setup() {
 	pinMode(LED_KILL_MX, OUTPUT);
 	pinMode(LED_KILL_Y, OUTPUT);
 	pinMode(LED_KILL_MY, OUTPUT);
+
+	// set all kill switchen to input
+	DDRB &= ~( (1 << PIN_KILL_X) | (1 << PIN_KILL_MX) | (1 << PIN_KILL_Y) | (1 << PIN_KILL_MY) );
 }
 
 void loop() {
@@ -106,6 +120,10 @@ void loop() {
 			  	break;
 			case SET_POS:
 			  	curSteps[nMotor] = readInt();
+			  	Serial.print(EOM);
+			  	break;
+			case PC_INT:
+				Serial.print(PINB, HEX);
 			  	Serial.print(EOM);
 			  	break;
 			default:  // command not understood
@@ -148,13 +166,12 @@ void flushBuffer(){
 void failed(){
 	Serial.print(CMD_ERROR);
 	Serial.print(EOM);
-	flushBuffer();
 	return;
 }
 
 int moveSteps(int iMotor, int iSteps){
-	int dir = 0, mult = 1, led_pin;
-	Adafruit_StepperMotor* cur_stepper;
+	int mult = 1, led_pin; 
+	uint8_t dir = 0x00, kill_status = 0x00;
 
 	// get direction
 	if (iSteps < 0){
@@ -180,12 +197,54 @@ int moveSteps(int iMotor, int iSteps){
 	digitalWrite(led_pin, HIGH); 
 	for (i = 0; i < iSteps; i++){
 	  	cur_stepper->onestep(dir, DOUBLE);
-		delay(SINGLE_STEP_DELAY);
-		if (is_interrupt) break;	// if an interrupt happened, stop moving
 		curSteps[iMotor] += 1*mult;	// +- 1 step
-	}  
+		delay(SINGLE_STEP_DELAY);
+
+		// check if a kill switch was toggled
+		kill_status = PIN_KILL & ( (1 << PIN_KILL_X) | (1 << PIN_KILL_MX) | (1 << PIN_KILL_Y) | (1 << PIN_KILL_MY) );
+		if ( kill_status ){
+			// turn leds on
+			switch (kill_status){
+			case ( (1 << PIN_KILL_X) ):
+				digitalWrite(LED_KILL_X, HIGH);
+				break;
+			case ( (1 << PIN_KILL_MX) ):
+				digitalWrite(LED_KILL_MX, HIGH);
+				break;
+			case ( (1 << PIN_KILL_Y) ):
+				digitalWrite(LED_KILL_Y, HIGH);
+				break;
+			case ( (1 << PIN_KILL_MY) ): 
+				digitalWrite(LED_KILL_MY, HIGH);
+				break;
+			default:
+				break;
+			}
+
+
+			if (dir == FORWARD)	// FORWARD = 1, BACKWARD = 2...
+				cur_stepper->step(100, BACKWARD, DOUBLE);
+			else
+				cur_stepper->step(100, FORWARD, DOUBLE);
+				
+			i -= 100*mult;
+			curSteps[iMotor] -= 100*mult;	// -+ 10 steps
+
+			// turn leds off again...
+			digitalWrite(LED_KILL_X, LOW);
+			digitalWrite(LED_KILL_MX, LOW);
+			digitalWrite(LED_KILL_Y, LOW);
+			digitalWrite(LED_KILL_MY, LOW);
+
+			break;
+		}
+	}
 	digitalWrite(led_pin, LOW); 
 	if (!stepper_hold) cur_stepper->release();
 	// return actual number of steps taken
 	return i*mult;
+}
+
+bool isAtMax(){
+	
 }
