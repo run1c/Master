@@ -59,6 +59,7 @@ char cbuf;				// char buffer...
 int nMotor = 0;
 int nSteps = 0;				// stores the no of steps to go
 int curSteps[2] = {0, 0};		// stores current position in steps
+const int correctionSteps = 100;	// no of steps to step back after hitting a kill switch 
 
 uint8_t old_int = 0x00, new_int = 0x00;	// stores status of pin change interrupts
 
@@ -79,7 +80,7 @@ void setup() {
 	pinMode(LED_KILL_Y, OUTPUT);
 	pinMode(LED_KILL_MY, OUTPUT);
 
-	// set all kill switchen to input
+	// set all kill switches to input
 	DDRB &= ~( (1 << PIN_KILL_X) | (1 << PIN_KILL_MX) | (1 << PIN_KILL_Y) | (1 << PIN_KILL_MY) );
 }
 
@@ -97,9 +98,10 @@ void loop() {
 			// command delimiter has to be followed by a motor number
 			nMotor = readInt();
 			if ( (nMotor != 0) && (nMotor != 1) )	// should be 0 or 1
-				goto fail;	// no exceptions in C, so a goto will have to do..
+				failed();
 			// next byte should be a command
 			cbuf = readByte();
+        		digitalWrite(LED_DATA, LOW);
 			switch(cbuf){  // which command?
 			case MOVE:  // we need another integer!
 				nSteps = readInt(false);
@@ -127,12 +129,13 @@ void loop() {
 			  	Serial.print(EOM);
 			  	break;
 			default:  // command not understood
-			 	fail: failed();
+			 	failed();
       			}
-    		}
-		// done reading
-                digitalWrite(LED_DATA, LOW);
-  	} 
+    		} else {
+			//failed();
+        		digitalWrite(LED_DATA, LOW);
+  		}
+	} 
 }
 
 int readByte(bool echo){
@@ -164,6 +167,7 @@ void flushBuffer(){
 }
 
 void failed(){
+	flushBuffer();
 	Serial.print(CMD_ERROR);
 	Serial.print(EOM);
 	return;
@@ -221,14 +225,14 @@ int moveSteps(int iMotor, int iSteps){
 				break;
 			}
 
-
 			if (dir == FORWARD)	// FORWARD = 1, BACKWARD = 2...
-				cur_stepper->step(100, BACKWARD, DOUBLE);
+				cur_stepper->step(correctionSteps, BACKWARD, DOUBLE);
 			else
-				cur_stepper->step(100, FORWARD, DOUBLE);
-				
-			i -= 100*mult;
-			curSteps[iMotor] -= 100*mult;	// -+ 10 steps
+				cur_stepper->step(correctionSteps, FORWARD, DOUBLE);
+			
+			// take correction steps into account	
+			i = (i- correctionSteps)*mult;
+			curSteps[iMotor] -= correctionSteps*mult;	// -+ 10 steps
 
 			// turn leds off again...
 			digitalWrite(LED_KILL_X, LOW);
@@ -243,8 +247,4 @@ int moveSteps(int iMotor, int iSteps){
 	if (!stepper_hold) cur_stepper->release();
 	// return actual number of steps taken
 	return i*mult;
-}
-
-bool isAtMax(){
-	
 }
