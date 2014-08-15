@@ -233,6 +233,11 @@ void command_handler(uint8_t command){
 		sendByte(command);
 		sendString(EOM);
 		break;
+		
+		case DAC_CAL:
+		sendByte(command);
+		sendString(EOM);
+		break;
 	
 		default:
 		MPPC_status = ADDRESSED;
