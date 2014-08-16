@@ -21,7 +21,7 @@
 
 using namespace std;
 
-#define VERBOSE
+// #define VERBOSE
 
 // determines the baseline by fitting a line to the first n points of the histo
 // slope and offset determine the quality of the fit
@@ -29,6 +29,16 @@ using namespace std;
 float getBaseline(TH1F* histo, float start, float stop, float &slope, float &offset);
 
 int main(int argc, char** argv){
+
+	/*
+	 *	I M P O R T A N T
+	 * 	=================
+	 * 	
+	 * 	First you have to adjust the readout ON the scope itself! 
+	 *	ACQUIRE -> MENU -> Horizontal Resolution -> Fast Trigger (500 Points)
+	 *	Also the screen has to start @ -70ns and end @130ns (20ns per division)
+	 */ 
+
 	int nSamples = 0;
 	float t_min = -70e-9, t_max = 130e-9;	// min and max time on the scope screen
 
@@ -45,14 +55,14 @@ int main(int argc, char** argv){
 	} 
 
 	// serial port setup
-	linux_rs232 com("/dev/ttyUSB0", 38400);
+	linux_rs232 com("/dev/ttyUSB2", 38400);
 	TDS3000 scope(&com);
 
 	printf("[Gain Measurement] - Init scope..\n");
  
 	// scope setup
 	const int sample_len = 500;	// or 10000 (slower...)
-	scope.selectSource(TDS3000_CH2);
+	scope.selectSource(TDS3000_CH1);
 	scope.setRecordLength(sample_len);
 	scope.setStartPoint(1);
 	scope.setStopPoint(sample_len);
@@ -86,14 +96,18 @@ int main(int argc, char** argv){
 #ifdef VERBOSE
 		printf("[Gain Measurement] - Reading scope... ");
 #endif
+		fill_n(t, sample_len, 0.);
+		fill_n(u, sample_len, 0.);
 		len = scope.getWaveformReading(t, u);
 #ifdef VERBOSE
 		printf("DONE\n");
 #endif
 		usleep(1e5);
 		// fill histo
-		for (int i = 0; i < len; i++)
+		for (int i = 0; i < len; i++){
 			h_pulse->Fill(t[i], -1*u[i]);
+	//		printf("%f \t %f\n", t[i], u[i]);
+		}
 #ifndef VERBOSE	
 		cout << "[Gain Measurement] - Progress " << iSample << "/" << nSamples << "\t\r" << flush;
 #endif
