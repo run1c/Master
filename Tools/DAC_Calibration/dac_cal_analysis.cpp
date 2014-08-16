@@ -9,6 +9,9 @@
 #include <TGraphErrors.h>
 #include <TMultiGraph.h>
 
+// new fe board, new dac
+#define MPPC_M
+
 int main(int argc, char** argv){
 
    	gSystem->Load("libTree");
@@ -34,11 +37,19 @@ int main(int argc, char** argv){
 	// get nMeas, nSteps, min and max val for dac and volt
 	in_tree->GetEntry(in_tree->GetEntries() - 1);
 	dac_max = dac_counts;
+#ifdef MPPC_M
+	volt_min = volt;
+#else
 	volt_max = volt;
+#endif
 
 	in_tree->GetEntry(0);
 	dac_min = dac_counts;
+#ifdef MPPC_M
+	volt_max = volt;
+#else
 	volt_min = volt;
+#endif
 
 	printf("[DAC Analysis] - Found %i steps with %i measurements per step (total %i events)...\n", nSteps, nMeas, nSteps*nMeas);
 	printf("[DAC Analysis] - Range DAC (%i..%i), range voltage (%.1f..%.1f)mV.\n", dac_min, dac_max, volt_min, volt_max);
@@ -47,6 +58,9 @@ int main(int argc, char** argv){
 	TH1F* volt_histo = new TH1F("volt", "h_volt; bias voltage [mV]", (int)(volt_max - volt_min), volt_min - 10., volt_max + 10.);
 	TH1F* volt_rms_histo = new TH1F("voltage RMS", "voltage RMS;RMS [mV];#", 25 , 0., 2.5);
 	TF1* lin_fit = new TF1("lin_fit", "[0] + [1]*x", dac_min, dac_max);
+#ifdef MPPC_M
+	lin_fit->SetParameters(68000, -1.6);	// if new fe board
+#endif
 	lin_fit->SetParNames("U_{0} [V]", "#DeltaU/#DeltaDAC [V/counts]");
 
 	float volt_mean, volt_rms;

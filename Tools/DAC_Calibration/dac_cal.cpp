@@ -19,9 +19,10 @@
 #include <TTree.h>
 #include <TGraphErrors.h>
 #include <TF1.h>
+#include <TCanvas.h>
 
-#define SIPM_COM "/dev/ttyUSB3"
-#define KEITHLEY_COM "/dev/ttyUSB2"
+#define SIPM_COM "/dev/ttyUSB1"
+#define KEITHLEY_COM "/dev/ttyUSB0"
 
 using namespace std;
 
@@ -63,7 +64,7 @@ int main(int argc, char** argv){
 		}
 	}
 
-	printf("[DAC cal] - Setup: FE addr 0x%02X SiPM %c; DAC %i-%i in %i steps with %i measurements.\n", fe_addr, 'B', start_DAC, stop_DAC, nSteps, nMeas);
+	printf("[DAC cal] - Setup: FE addr 0x%02X SiPM %c; DAC %i-%i in %i steps with %i measurements.\n", fe_addr, sipm_no, start_DAC, stop_DAC, nSteps, nMeas);
 
 	/* MPPC_D setup */
 
@@ -132,7 +133,10 @@ int main(int argc, char** argv){
 
 	TGraphErrors* cal_gr = new TGraphErrors();
 	cal_gr->SetTitle(";DAC counts;U[mV]");
-	TF1* cal_fit = new TF1("cal fit", "[0] + [1]*x", start_DAC, stop_DAC);	
+	TF1* cal_fit = new TF1("cal fit", "[0] + [1]*x", start_DAC, stop_DAC);
+	if (fe_addr > 0x1F)	// new models, different DAC!
+		cal_fit->SetParameters(68000, -1.6);	
+	TCanvas* c1 = new TCanvas();
 
 	// and now what we would like to know..
 	double DAC_gain, DAC_gain_err,
@@ -142,7 +146,7 @@ int main(int argc, char** argv){
 	ofstream result(sName.str().c_str(), ofstream::out);
 
 	/* Start calibration */
-	for (int iStep = 0; iStep < nSteps; iStep++){
+	for (int iStep = 0; iStep < (nSteps+1); iStep++){
 		mean_voltage = 0;
 		mean_voltage2 = 0;
 		voltage_err = 0;
@@ -155,8 +159,8 @@ int main(int argc, char** argv){
 		 */
 
 		cur_DAC = start_DAC + DAC_per_step*iStep;
-		if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(cur_DAC*0.001);
-		if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(cur_DAC*0.001);
+		if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(cur_DAC*0.005);
+		if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(cur_DAC*0.005);
 		printf("[DAC Cal] - DAC %i\r", cur_DAC);
 
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
@@ -198,7 +202,9 @@ int main(int argc, char** argv){
 
 	printf("[DAC Cal] - Results written to '%s'!\n", sName.str().c_str());
 
+	cal_gr->Draw("A*");
 	cal_gr->Write();
+	c1->Write();
 	out_tree->Write();
 
 	// cleanup
