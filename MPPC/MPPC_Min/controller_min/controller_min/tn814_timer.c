@@ -21,14 +21,19 @@ void timer_init(void){
 	 */
 	
 	TCCR1A = (1 << COM1A1);	// non inverting pwm
-	TCCR1A |= (1 << WGM11);	// fast pwm, max = ICR1
+	TCCR1A |= (1 << WGM11);	// fast pwm, TOP = ICR1
 	TCCR1B = (1 << WGM12) | (1 << WGM13);
-	TCCR1B |= (1 << CS10) | (1 << CS11);	// prescaler 64 
+	TCCR1B |= (1 << CS10);	// prescaler N = 1 
 
 	TCNT1 = 0x0000;
 	
-	OCR1A = 0x00FF;	// sets the duty cycle of the signal
-	ICR1 = 0x0FFF;	// sets the period
+	OCR1A = 0x0000;	// sets the duty cycle of the signal -> PWM off
+	ICR1 = 0x07FF;	// 1 period = counting from 0 to 2^11
+	
+	// set multiplexer to output OC1A to TOCC7
+	DDRB |= (1 << PORTB2);	// PB2 = TOCC7 output
+	TOCPMSA1 = (1 << TOCC7S0);
+	TOCPMCOE = (1 << TOCC7OE);	// enable output
 
 	return;
 }

@@ -38,6 +38,8 @@
 #define READING 4
 #define SENDING 5
 
+#define ADC_REG OCR1A
+
 void driverSend(void);
 void driverReceive(void);
 
@@ -81,8 +83,7 @@ int main(void)
 	sendString(str_buf);
 	sendString(EOM);
 	
-    while(1)
-    {
+    while(1) {
 		// check if there is something to be read (non blocking...)
 		if ( USART_dataAvaliable() ){
 			read_buf = 0x00;
@@ -181,7 +182,13 @@ void command_handler(uint8_t command){
 		case SET_UBIAS_A:
 		// echo the command
 		sendByte(command);
+		// waiting for a 4 character string
+		receiveString(sbuf, 4);
 		sendString(EOM);
+		// set ADC register to given value
+		wbuf = AsciiToHex(sbuf, 4);
+		// max 0x7FF
+		ADC_REG = 0x7FF & wbuf;
 		break;
 
 		/* set the temperature progression coefficient */
@@ -189,13 +196,20 @@ void command_handler(uint8_t command){
 		case SET_COEFF:
 		// echo...
 		sendByte(command);
+		// waiting for a 2 character string
+		receiveString(sbuf, 2);
 		sendString(EOM);
+//		Vcoef = AsciiToHex(sbuf, 2);
+		// max value = 0x7F
+//		Vcoef &= 0x7F;		
 		break;
 
 		/* read the calculated adjusted operational voltage */
 
 		case READ_UADJ_A:
 		sendByte(command);
+		HexToAscii(sbuf, 5, ADC_REG);
+		sendString(sbuf);
 		sendString(EOM);
 		break;
 
@@ -216,6 +230,11 @@ void command_handler(uint8_t command){
 
 		/* print sipm info of module */
 		case SIPM_INFO:
+		sendByte(command);
+		sendString(EOM);
+		break;
+		
+		case DAC_CAL:
 		sendByte(command);
 		sendString(EOM);
 		break;
