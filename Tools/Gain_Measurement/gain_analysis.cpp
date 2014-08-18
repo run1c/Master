@@ -97,12 +97,24 @@ int main(int argc, char** argv){
 	// calculate gain as distance of the maxima
 	float* gain = new float[nMax-1];
 	float* gain_err = new float[nMax-1];
+	float mean_gain = 0., mean_gain_err = 0., separability = 0., sep_err = 0.;
 	for (int i = 0; i < (nMax-1); i++){
 		gain[i] = mean[i + 1] - mean[i];
 		gain_err[i] = sqrt( pow(mean_err[i], 2) + pow(mean_err[i + 1], 2) );
 		printf("[Gain Analysis] - Measured gain (%f-+%f)mV\n", 1000.*gain[i], 1000.*gain_err[i]);
-	}
 		
+		// weighted mean
+		mean_gain += gain[i]/(gain_err[i]*gain_err[i]);
+		mean_gain_err += 1./(gain_err[i]*gain_err[i]);
+	}
+	
+	mean_gain_err = 1./mean_gain_err;
+	mean_gain *= mean_gain_err;
+	printf("[Gain Analysis] - Mean gain (%f-+%f)mV\n", 1000.*mean_gain, 1000.*sqrt(mean_gain_err));
+
+	separability = gain[0]/sqrt( sigma[0]*sigma[0] + sigma[1]*sigma[1] );
+	printf("[Gain Analysis] - separability (%f-+%f)\n", separability, sep_err);
+	
 	// cleanup
 	file->Close();
 	return 0;

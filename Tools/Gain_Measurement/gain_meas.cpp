@@ -81,8 +81,8 @@ int main(int argc, char** argv){
 	TH1F* h_pulse = new TH1F("h_pulse", "h_pulse", sample_len+1, t_min, t_max);
 	TCanvas* c1 = new TCanvas();
 	TTree* out_tree = new TTree("outtree", "gain_tree");
-	out_tree->Branch("time", t, "t[500]/F");
-	out_tree->Branch("amplitude", u, "u[500]/F");
+	out_tree->Branch("time", t, "t[500]/D");
+	out_tree->Branch("amplitude", u, "u[500]/D");
 	out_tree->Branch("len", &len);
 	out_tree->Branch("slope", &slope);
 	out_tree->Branch("offset", &offset);
@@ -106,7 +106,7 @@ int main(int argc, char** argv){
 		// fill histo
 		for (int i = 0; i < len; i++){
 			h_pulse->Fill(t[i], -1*u[i]);
-	//		printf("%f \t %f\n", t[i], u[i]);
+//			printf("%e \t %e\n", t[i], u[i]);
 		}
 #ifndef VERBOSE	
 		cout << "[Gain Measurement] - Progress " << iSample << "/" << nSamples << "\t\r" << flush;
