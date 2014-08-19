@@ -53,10 +53,15 @@ void sendString(char* str);
 
 void command_handler(uint8_t command);
 float getTemperature(uint16_t temp);
+uint16_t calcAdjustedBiasVoltage(float temperature);
 
 // global variables
 uint8_t MPPC_status = IDLE;
-uint8_t own_addr = 0x20;
+uint8_t own_addr = 0x20, Vcoef = 57;
+char SerNoA[9] = "3H00004\0";
+uint32_t VopA = 67290;
+float DACGainA = -1.627f;
+float DACOffA = 68698;
 
 int main(void)
 {
@@ -144,6 +149,9 @@ int main(void)
 			} // end switch
 
 		} // end if
+		
+		// apply bias voltages
+		setBiasVoltage();
 	}
 }
 
@@ -208,7 +216,12 @@ void command_handler(uint8_t command){
 
 		case READ_UADJ_A:
 		sendByte(command);
-		HexToAscii(sbuf, 5, ADC_REG);
+		// get temperature
+		fbuf = getTemperature( ADC_read() );
+		// calculate temperature adjusted voltage
+		wbuf = calcAdjustedBiasVoltage(fbuf);
+		// create string
+		HexToAscii(sbuf, 5, wbuf);
 		sendString(sbuf);
 		sendString(EOM);
 		break;
@@ -363,6 +376,24 @@ void sendString(char* str){
 float getTemperature(uint16_t temp){
 	float voltage = (float)temp/1024. * 1.1;	// 10 bit adc, internal 1V1 analog reference
 	return ( (voltage - 0.5) * 100. );	// 500mV offset = 0degC, 0.01V/degC = 100degC/V
+}
+
+uint16_t calcAdjustedBiasVoltage(float temperature){
+	return (uint16_t)(( Vcoef*(temperature - 25.) + VopA )/5.); 
+}
+
+void setBiasVoltage(){
+	float temperature;
+	uint16_t biasVoltage_5mV;	// bias voltage in 5mV steps
+	uint16_t DACcounts;
+	// get the temperature and calculate the voltage	
+	temperature = getTemperature( ADC_read() );
+	biasVoltage_5mV = calcAdjustedBiasVoltage(temperature);
+	// calculate dac counts
+	DACcounts = (uint16_t) ( (biasVoltage_5mV*5. - DACOffA)/DACGainA );
+	// apply changes to PWM register
+	OCR1A = DACcounts;
+	return;
 }
 
 ISR(USART0_TX_vect){
