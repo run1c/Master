@@ -38,7 +38,7 @@ int main(int argc, char** argv){
 
 	stringstream ssbuf;
 	int nSamples = tree->GetEntries();
-	float pulse_height, width = 0.01, min_height = 0.;
+	float pulse_height, width = 0.002, min_height = 0.;
 	float* mean = new float[nMax];
 	float* sigma = new float[nMax];
 	float* mean_err = new float[nMax];
@@ -60,7 +60,6 @@ int main(int argc, char** argv){
 			if (pulse_height < min_height) continue;
 			h_spec->Fill(pulse_height);
 		}
-		
 		
 		// set preleminary parameters to improve fit results
 		mean[iMax] = h_spec->GetBinCenter( h_spec->GetMaximumBin() );
@@ -113,6 +112,11 @@ int main(int argc, char** argv){
 	printf("[Gain Analysis] - Mean gain (%f-+%f)mV\n", 1000.*mean_gain, 1000.*sqrt(mean_gain_err));
 
 	separability = gain[0]/sqrt( sigma[0]*sigma[0] + sigma[1]*sigma[1] );
+
+	sep_err = sqrt( gain_err[0]*gain_err[0]/(sigma[0]*sigma[0] + sigma[1]*sigma[1]) + 
+			sigma[0]*sigma[0]*gain[0]*gain[0]*sigma_err[0]*sigma_err[0]/pow( sigma[0]*sigma[0] + sigma[1]*sigma[1] , 3) + 
+			sigma[1]*sigma[1]*gain[0]*gain[0]*sigma_err[1]*sigma_err[1]/pow( sigma[0]*sigma[0] + sigma[1]*sigma[1] , 3) );
+
 	printf("[Gain Analysis] - separability (%f-+%f)\n", separability, sep_err);
 	
 	// cleanup

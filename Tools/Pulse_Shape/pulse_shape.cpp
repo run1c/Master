@@ -49,6 +49,7 @@ int main(int argc, char** argv){
 	
 	TCanvas* c1 = new TCanvas();
 	TGraph* pulse = new TGraph();
+	pulse->SetTitle("Output pulse;t [s];U [V]");
 	pulse->SetMarkerStyle(7);
 	TGraph* rf = new TGraph();	// drawing rise and fall time points
 	rf->SetMarkerStyle(8);
@@ -86,7 +87,6 @@ int main(int argc, char** argv){
                         }
                 }
                 riseTime = hTime - lTime;
- 		printf("[Pulse Shape] - Risetime = %e s\n", riseTime);
 		rf->SetPoint(0, lTime, lPos);               
 		rf->SetPoint(1, hTime, hPos);               
  
@@ -102,15 +102,17 @@ int main(int argc, char** argv){
                 }
                 fallTime = rTime - hTime;
 		pulseDuration = rTime - lTime; 
-		printf("[Pulse Shape] - Falltime = %e s\n", pulseDuration);
- 		printf("[Pulse Shape] - Pulse duration = %e s\n", fallTime);
-		rf->SetPoint(2, lTime, lPos);               
+		rf->SetPoint(2, rTime, lPos);               
 		rf->SetPoint(3, hTime, hPos);               
 
 		out_tree->Fill();
 
-                // draw & save every 50th event
-                if (iEvent%50 == 0) {
+                // draw & save every 500th event
+                if (iEvent%10 == 0) {
+ 			printf("[Pulse Shape] - Risetime = %e s\n", riseTime);
+			printf("[Pulse Shape] - Falltime = %e s\n", pulseDuration);
+ 			printf("[Pulse Shape] - Pulse duration = %e s\n", fallTime);
+			
 			bl->SetParameter(0, baseline);
                         pulse->Draw("A*");
 			bl->Draw("SAME");

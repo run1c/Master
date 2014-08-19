@@ -8,7 +8,7 @@
 #include <rs232/linux_rs232.h>
 #include <rs232/TEKTRONIX/TDS3000.h>
 // root
-#include <TH1F.h>
+#include <TH1D.h>
 #include <TF1.h>
 #include <TCanvas.h>
 #include <TTree.h>
@@ -21,12 +21,12 @@
 
 using namespace std;
 
-// #define VERBOSE
+//#define VERBOSE
 
 // determines the baseline by fitting a line to the first n points of the histo
 // slope and offset determine the quality of the fit
 // (slope ~= 0, offset ~= 0)
-float getBaseline(TH1F* histo, float start, float stop, float &slope, float &offset);
+float getBaseline(TH1D* histo, float start, float stop, float &slope, float &offset);
 
 int main(int argc, char** argv){
 
@@ -55,7 +55,7 @@ int main(int argc, char** argv){
 	} 
 
 	// serial port setup
-	linux_rs232 com("/dev/ttyUSB2", 38400);
+	linux_rs232 com("/dev/ttyUSB0", 38400);
 	TDS3000 scope(&com);
 
 	printf("[Gain Measurement] - Init scope..\n");
@@ -78,7 +78,7 @@ int main(int argc, char** argv){
 	float baseline, pulse_height, slope, offset;
 	// root stuff
 	TFile* out_file = new TFile(argv[2], "RECREATE");
-	TH1F* h_pulse = new TH1F("h_pulse", "h_pulse", sample_len+1, t_min, t_max);
+	TH1D* h_pulse = new TH1D("h_pulse", "h_pulse", sample_len*2, t_min, t_max);
 	TCanvas* c1 = new TCanvas();
 	TTree* out_tree = new TTree("outtree", "gain_tree");
 	out_tree->Branch("time", t, "t[500]/D");
@@ -104,9 +104,9 @@ int main(int argc, char** argv){
 #endif
 		usleep(1e5);
 		// fill histo
-		for (int i = 0; i < len; i++){
+		for (int i = 0; i < sample_len; i++){
 			h_pulse->Fill(t[i], -1*u[i]);
-//			printf("%e \t %e\n", t[i], u[i]);
+//			printf("%i \t %e \t %e\n", i, t[i], -1*u[i]);
 		}
 #ifndef VERBOSE	
 		cout << "[Gain Measurement] - Progress " << iSample << "/" << nSamples << "\t\r" << flush;
@@ -140,7 +140,7 @@ int main(int argc, char** argv){
 	out_file->Close();
 }
 
-float getBaseline(TH1F* histo, float start, float stop, float &slope, float&offset){
+float getBaseline(TH1D* histo, float start, float stop, float &slope, float&offset){
 	float baseline = 0.;
 	TF1* f_baseline = new TF1("fun baseline", "[0] + [1]*x", start, stop);
 	histo->Fit(f_baseline, "Q", "", start, stop);
