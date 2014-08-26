@@ -6,6 +6,7 @@
 #include <math.h>
 // root
 #include <TSystem.h>
+#include <TStyle.h>
 #include <TTree.h>
 #include <TH1F.h>
 #include <TF1.h>
@@ -16,6 +17,8 @@ using namespace std;
 
 int main(int argc, char** argv){
    	gSystem->Load("libTree");
+	gStyle->SetOptFit();
+
 
 	char* file_name;
 	int nMax;
@@ -34,7 +37,7 @@ int main(int argc, char** argv){
 	// init root stuff
 	TFile* file = TFile::Open(file_name, "READ");
 	TTree* tree = (TTree*)file->Get("outtree");
-	TH1F* h_spec = new TH1F("h_spec", "fingerspectrum", 200, 0, 0.1);
+	TH1F* h_spec = new TH1F("h_spec", "fingerspectrum", 100, 0, 0.1);
 
 	stringstream ssbuf;
 	int nSamples = tree->GetEntries();
