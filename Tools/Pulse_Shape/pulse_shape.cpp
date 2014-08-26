@@ -108,7 +108,7 @@ int main(int argc, char** argv){
 		out_tree->Fill();
 
                 // draw & save every 500th event
-                if (iEvent%10 == 0) {
+                if (iEvent%100 == 0) {
  			printf("[Pulse Shape] - Risetime = %e s\n", riseTime);
 			printf("[Pulse Shape] - Falltime = %e s\n", pulseDuration);
  			printf("[Pulse Shape] - Pulse duration = %e s\n", fallTime);

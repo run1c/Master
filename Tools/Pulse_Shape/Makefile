@@ -1,4 +1,5 @@
 BIN=pulse_shape
+BIN2=pulse_shape_comparison
 OBJ=
 CC=g++
 
@@ -7,18 +8,15 @@ ROOTCFLAGS:=$(shell root-config --cflags)
 ROOTLIBS:=$(shell root-config --libs)
 ROOTGLIBS:=$(shell root-config --glibs)
 
-LIBLAB=$(HOME)/liblab/
-
-CFLAGS=-g -Wall $(ROOTCFLAGS) -I$(LIBLAB) 
-LDFLAGS=-L$(LIBLAB) $(ROOTGLIBS) -llab
+CFLAGS=-g -Wall $(ROOTCFLAGS)
 
 all: $(BIN) $(BIN2)
 
 %.o: %.cpp
-	$(CC) -c $(CFLAGS) $^
+	$(CC) -c $(CFLAGS) $<
 
-$(BIN): $(BIN).o $(OBJ)
-	$(CC) $^ -o $@ $(LDFLAGS)
+$(BIN): $(BIN).o
+	$(CC) $^ -o $@ $(ROOTGLIBS)
 
 $(BIN2): $(BIN2).o
 	$(CC) $^ -o $@ $(ROOTGLIBS)

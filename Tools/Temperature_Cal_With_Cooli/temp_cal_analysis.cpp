@@ -53,6 +53,9 @@ int main(int argc, char** argv){
 	TH1F* diff_histo = new TH1F("diff", "h_diff", 100, -5., 5.);
 	// histo of RMSs of the differences to get the mean deviation of the pt100 sensor
 	TH1F* diff_rms_histo = new TH1F("RMS distribution", "h_diff_rms", 21, 0., 0.2);
+	// correlation between pt100 and cooli temperature
+	TGraphErrors* corr_gr = new TGraphErrors();
+	TF1* corr_fit = new TF1("corr fit", "[0] + [1]*x", 0, 100);
 
 	// we would also like to see the temporal progress of the temperature
 	float pt100_mean, pt100_rms, cooli_mean, cooli_rms, diff_mean, diff_rms;
@@ -105,6 +108,9 @@ int main(int argc, char** argv){
 			diff_max = diff_rms; 
 
 		printf("[Temperature Analysis]\t%i\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n", iStep, pt100_mean, pt100_rms, cooli_mean, cooli_rms, diff_mean, diff_rms);
+			
+		corr_gr->SetPoint(iStep, pt100_mean, cooli_mean);
+		corr_gr->SetPointError(iStep, pt100_rms, cooli_rms);
 
 		t_pt100->SetPoint(iStep, (float)time, pt100_mean);
 		t_pt100->SetPointError(iStep, 0., pt100_rms);
@@ -122,6 +128,11 @@ int main(int argc, char** argv){
 
 	printf("[Temperature Analysis] - Done!\n");
 	printf("[Temperature Analysis] - Min.=%.4f\tAvg.=%.4f\tMax.=%.4f!\n", diff_min, diff_rms_histo->GetMean(), diff_max);
+
+	TCanvas* c1 = new TCanvas();
+	corr_gr->Fit(corr_fit);
+	corr_gr->Draw("A*");
+	c1->Write();
 
 	diff_rms_histo->Write();
 	mg->Add(t_pt100);
