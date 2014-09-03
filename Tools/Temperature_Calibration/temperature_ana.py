@@ -48,12 +48,12 @@ adc_mean_list = []
 adc_rms_list = []
 temperature_list = []
 
-for iStep in range(nSteps):
+for iStep in xrange(0, nSteps-2, 1):
 	h_dac.Reset();
 	adc_mean = 0.
 	adc_mean2 = 0.
 	for iMeas in range(nMeas):
-		in_tree.GetEntry(iMeas + iStep*nMeas)
+		in_tree.GetEntry(iMeas + (iStep+1)*nMeas)
 		adc_mean += adc_counts[0]
 		adc_mean2 += adc_counts[0]*adc_counts[0]
 
@@ -75,7 +75,7 @@ gr_temperature.Draw("AP")
 
 res_list = []
 # residuals
-for iStep in range(nSteps):
+for iStep in xrange(0, nSteps-2, 1):
 	res_list.append( temperature_list[iStep] - fit(adc_mean_list[iStep]) )
 	gr_res.SetPoint(iStep, adc_mean_list[iStep], res_list[iStep])
 	gr_res.SetPointError(iStep, adc_rms_list[iStep], 0.)

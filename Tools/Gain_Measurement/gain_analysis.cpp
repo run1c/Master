@@ -37,7 +37,7 @@ int main(int argc, char** argv){
 	// init root stuff
 	TFile* file = TFile::Open(file_name, "READ");
 	TTree* tree = (TTree*)file->Get("outtree");
-	TH1F* h_spec = new TH1F("h_spec", "fingerspectrum", 100, 0, 0.1);
+	TH1F* h_spec = new TH1F("Fingerspectrum", "Integrated SiPM spectrum;U [mV]", 100, 0, 0.1);
 
 	stringstream ssbuf;
 	int nSamples = tree->GetEntries();
@@ -81,7 +81,7 @@ int main(int argc, char** argv){
 		sbuf = file_name;
 		sbuf = sbuf.substr(0, sbuf.find(".root"));
 		ssbuf.str("");
-		ssbuf << sbuf.c_str() << "fit" << (iMax+1) << "_" << ".jpg";
+		ssbuf << sbuf.c_str() << "fit" << (iMax+1) << "_" << ".pdf";
 		// save image
 		c1->SaveAs(ssbuf.str().c_str());
 		// get parameters

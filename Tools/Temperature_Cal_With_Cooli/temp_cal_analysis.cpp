@@ -6,6 +6,7 @@
 #include <TTree.h>
 #include <TCanvas.h>
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TGraphErrors.h>
 #include <TMultiGraph.h>
 #include <TLegend.h>
@@ -55,10 +56,18 @@ int main(int argc, char** argv){
 	TH1F* diff_rms_histo = new TH1F("RMS distribution", "h_diff_rms", 21, 0., 0.2);
 	// correlation between pt100 and cooli temperature
 	TGraphErrors* corr_gr = new TGraphErrors();
+	corr_gr->SetTitle("MPPC D and Cooli temperature correlation; T_{pt100} [#circC]; T_{cooli} [#circC]");
 	TF1* corr_fit = new TF1("corr fit", "[0] + [1]*x", 0, 100);
+	corr_fit->SetLineColor(35);
+	// ideal correlation pt100 = cooli temperature
+	TF1* corr_id = new TF1("corr id", "[0] + x", 0, 100);
+	corr_id->SetLineColor(46);
+	TF1* line = new TF1("line", "0", 0, 100);
+	// 3d correlation plot
+	TH2F* h2_corr = new TH2F("Correlation histogram", "Temperature correlations;T_{pt100} [#circC];T_{cooli} [#circC];ADC counts", 37, 6.5, 25.5, 37, 6.5, 25.5); 
 
 	// we would also like to see the temporal progress of the temperature
-	float pt100_mean, pt100_rms, cooli_mean, cooli_rms, diff_mean, diff_rms;
+	float pt100_mean, pt100_rms, cooli_mean, cooli_rms, diff_mean, diff_rms, adc_mean;
 	float diff_min = 999, diff_max = 0;
 	TGraphErrors* t_pt100 = new TGraphErrors();
 	t_pt100->SetLineColor(35);
@@ -85,13 +94,23 @@ int main(int argc, char** argv){
 		pt100_histo->Reset();
 		cooli_histo->Reset();
 		diff_histo->Reset();
+		adc_mean = 0;
+
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
 			in_tree->GetEntry(iMeas + iStep*nMeas);
 			// fill the histos
 			pt100_histo->Fill(pt100_temp);
 			cooli_histo->Fill(cooli_temp);
 			diff_histo->Fill(cooli_temp - pt100_temp);
+			adc_mean += adc_count;
+		
+			t_pt100->SetPoint(iMeas + iStep*nMeas, (float)time, pt100_temp);
+			t_pt100->SetPointError(iMeas + iStep*nMeas, 0., 0.);
+			t_cooli->SetPoint(iMeas + iStep*nMeas, (float)time, cooli_temp);
+			t_cooli->SetPointError(iMeas + iStep*nMeas, 0., 0.);
 		}
+
+		adc_mean /= nMeas;
 		// extract mean and rms 
 		pt100_mean = pt100_histo->GetMean();
 		pt100_rms = pt100_histo->GetRMS();
@@ -107,18 +126,20 @@ int main(int argc, char** argv){
 		if (diff_rms > diff_max)
 			diff_max = diff_rms; 
 
-		printf("[Temperature Analysis]\t%i\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n", iStep, pt100_mean, pt100_rms, cooli_mean, cooli_rms, diff_mean, diff_rms);
+		printf("& %i \t& %.3f \t& %.3f \t& %.3f \t& %.3f \t& %.3f \t& %.3f \\\\ \n", iStep + 1, pt100_mean, pt100_rms, cooli_mean, cooli_rms, diff_mean, diff_rms);
 			
 		corr_gr->SetPoint(iStep, pt100_mean, cooli_mean);
 		corr_gr->SetPointError(iStep, pt100_rms, cooli_rms);
 
-		t_pt100->SetPoint(iStep, (float)time, pt100_mean);
-		t_pt100->SetPointError(iStep, 0., pt100_rms);
-		t_cooli->SetPoint(iStep, (float)time, cooli_mean);
-		t_cooli->SetPointError(iStep, 0., cooli_rms);
-		t_diff->SetPoint(iStep, (float)time, diff_mean);
-		t_diff->SetPointError(iStep, 0., diff_rms);
+//		t_pt100->SetPoint(iStep, (float)time, pt100_mean);
+//		t_pt100->SetPointError(iStep, 0., pt100_rms);
+//		t_cooli->SetPoint(iStep, (float)time, cooli_mean);
+//		t_cooli->SetPointError(iStep, 0., cooli_rms);
+//		t_diff->SetPoint(iStep, (float)time, diff_mean);
+//		t_diff->SetPointError(iStep, 0., diff_rms);
 		diff_rms_histo->Fill(diff_rms);
+
+		h2_corr->Fill(pt100_mean, cooli_mean, adc_mean);
 
 		// write out..
 		pt100_histo->Write();
@@ -129,9 +150,40 @@ int main(int argc, char** argv){
 	printf("[Temperature Analysis] - Done!\n");
 	printf("[Temperature Analysis] - Min.=%.4f\tAvg.=%.4f\tMax.=%.4f!\n", diff_min, diff_rms_histo->GetMean(), diff_max);
 
+	h2_corr->Write();
+
 	TCanvas* c1 = new TCanvas();
+	c1->Divide(2);
+	c1->cd(1);
+	corr_gr->Fit(corr_id);
 	corr_gr->Fit(corr_fit);
-	corr_gr->Draw("A*");
+	corr_gr->Draw("AP");
+	corr_id->Draw("SAME");
+
+	// residuals
+	TGraphErrors* corr_res = new TGraphErrors();
+	corr_res->SetTitle("Residuals; T_{pt100} [#circC]; T_{cooli} - T_{fit} [#circC]");
+	corr_res->SetMarkerColor(35);
+
+	TGraphErrors* corr_id_res = new TGraphErrors();
+	corr_id_res->SetTitle("Residuals; T_{pt100} [#circC]; T_{cooli} - T_{fit} [#circC]");
+	corr_id_res->SetMarkerColor(46);
+
+	float residual;
+	for (int i = 0; i < nSteps; i++){
+		residual =  corr_gr->GetY()[i] - corr_fit->Eval( corr_gr->GetX()[i] );
+		corr_res->SetPoint(i, corr_gr->GetX()[i], residual);
+		corr_res->SetPointError(i, corr_gr->GetErrorX(i), corr_gr->GetErrorY(i));	
+		
+		residual =  corr_gr->GetY()[i] - corr_id->Eval( corr_gr->GetX()[i] );
+		corr_id_res->SetPoint(i, corr_gr->GetX()[i], residual);
+		corr_id_res->SetPointError(i, corr_gr->GetErrorX(i), corr_gr->GetErrorY(i));	
+	}
+	c1->cd(2);
+	corr_id_res->Draw("A*");
+	corr_res->Draw("SAME*");
+	line->Draw("SAME");
+
 	c1->Write();
 
 	diff_rms_histo->Write();
