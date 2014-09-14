@@ -10,7 +10,8 @@
 #include <TMultiGraph.h>
 
 // new fe board, new dac
-#define MPPC_M
+//#define MPPC_M
+
 
 int main(int argc, char** argv){
 
@@ -24,6 +25,7 @@ int main(int argc, char** argv){
 	char* file_name = argv[1];
 	int dac_counts, nSteps, nMeas, dac_min, dac_max;
 	double volt, volt_min, volt_max, volt_rms_min = 999., volt_rms_max = 0.;
+	int fe_colour;
 
 	printf("[DAC Analysis] - Openig file '%s'...\n", file_name);
 
@@ -38,8 +40,10 @@ int main(int argc, char** argv){
 	in_tree->GetEntry(in_tree->GetEntries() - 1);
 	dac_max = dac_counts;
 #ifdef MPPC_M
+	fe_colour = kBlue;
 	volt_min = volt;
 #else
+	fe_colour = kRed;
 	volt_max = volt;
 #endif
 
@@ -55,8 +59,17 @@ int main(int argc, char** argv){
 	printf("[DAC Analysis] - Range DAC (%i..%i), range voltage (%.1f..%.1f)mV.\n", dac_min, dac_max, volt_min, volt_max);
 
 	TFile* out_file = new TFile("out.root", "recreate");
-	TH1F* volt_histo = new TH1F("volt", "h_volt; bias voltage [mV]", (int)(volt_max - volt_min), volt_min - 10., volt_max + 10.);
+
+	TH1F* volt_histo = new TH1F("Voltage distribution", "Voltage distribution;bias voltage V_{B} [mV]", (int)(volt_max - volt_min), volt_min - 10., volt_max + 10.);
+	volt_histo->SetLineColor(fe_colour);
+	volt_histo->SetFillColor(fe_colour);
+	volt_histo->SetFillStyle(3001);
+
 	TH1F* volt_rms_histo = new TH1F("voltage RMS", "voltage RMS;RMS [mV];#", 25 , 0., 2.5);
+	volt_rms_histo->SetLineColor(fe_colour);
+	volt_rms_histo->SetFillColor(fe_colour);
+	volt_rms_histo->SetFillStyle(3001);
+	
 	TF1* lin_fit = new TF1("lin_fit", "[0] + [1]*x", dac_min, dac_max);
 #ifdef MPPC_M
 	lin_fit->SetParameters(68000, -1.6);	// if new fe board
@@ -65,16 +78,16 @@ int main(int argc, char** argv){
 
 	float volt_mean, volt_rms;
 	TGraphErrors* gr_dac_vs_volt = new TGraphErrors();
-	gr_dac_vs_volt->SetTitle("output voltage vs. DAC counts;DAC [counts];U_{out} [mV]");
+	gr_dac_vs_volt->SetTitle("output voltage vs. DAC counts;DACword [counts];U_{out} [mV]");
 	gr_dac_vs_volt->GetYaxis()->SetTitleOffset(1.55);
 	gr_dac_vs_volt->SetLineColor(35);
-	gr_dac_vs_volt->SetMarkerStyle(7);
+	gr_dac_vs_volt->SetMarkerStyle(2);
 
 	TGraphErrors* gr_residuals = new TGraphErrors();
-	gr_residuals->SetTitle("residuals;DAC [counts];U_{out} - U_{fit} [mV]");
+	gr_residuals->SetTitle("residuals;DACword [counts];U_{out} - U_{fit} [mV]");
 	gr_residuals->GetYaxis()->SetTitleOffset(1.55);
 	gr_residuals->SetLineColor(35);
-	gr_residuals->SetMarkerStyle(7);
+	gr_residuals->SetMarkerStyle(2);
 	TF1* zero = new TF1("zero", "0", -1e6, 1e6);
 
 	printf("[DAC Analysis]\tstep\tdac\tvolt\t\trms\n");

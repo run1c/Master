@@ -93,7 +93,7 @@ int main(int argc, char** argv){
 		printf(" mean=(%.3f+-%.3f)mV, sigma=(%.3f+-%.3f)mV\n", 1000.*mean[iMax], 1000.*mean_err[iMax], 1000.*sigma[iMax], 1000.*sigma_err[iMax]);
 
 		// exclude first peak for next fit
-		min_height = mean[iMax] + width;
+		min_height = mean[iMax] + 2.*width;
 	}
 
 	// calculate gain as distance of the maxima

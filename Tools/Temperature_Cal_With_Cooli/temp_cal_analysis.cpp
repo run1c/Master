@@ -11,6 +11,10 @@
 #include <TMultiGraph.h>
 #include <TLegend.h>
 
+
+#define FE_COLOUR	kBlue
+#define COOLI_COLOUR	kGray+3
+
 int main(int argc, char** argv){
 
    	gSystem->Load("libTree");
@@ -48,12 +52,28 @@ int main(int argc, char** argv){
 
 	TFile* out_file = new TFile("out.root", "recreate");
 	// pt100 temperatures seem to be slightly smaller than set temperature
-	TH1F* pt100_histo = new TH1F("pt100", "h_pt100", 100, temp_min - 3., temp_max + 1.);
+	TH1F* pt100_histo = new TH1F("FE temperature", "FE temperature;T_{pt100} [#circC]", 100, temp_min - 3., temp_max + 1.);
+	pt100_histo->SetLineColor(FE_COLOUR);
+	pt100_histo->SetFillColor(FE_COLOUR);	// FEs colour!!
+	pt100_histo->SetFillStyle(3001);
+
 	// cooli and difference between pt100 and cooli
-	TH1F* cooli_histo = new TH1F("cooli", "h_cooli", 100, temp_min - 1., temp_max + 1.);
+	TH1F* cooli_histo = new TH1F("Cooli temperature", "Cooli temperature;T_{cooli} [#circC]", 100, temp_min - 1., temp_max + 1.);
+	cooli_histo->SetLineColor(COOLI_COLOUR);
+	cooli_histo->SetFillColor(COOLI_COLOUR);	// cooli colour!!
+	cooli_histo->SetFillStyle(3001);
+
 	TH1F* diff_histo = new TH1F("diff", "h_diff", 100, -5., 5.);
+	diff_histo->SetLineColor(COOLI_COLOUR);
+	diff_histo->SetFillColor(COOLI_COLOUR);	// diff colour!!
+	diff_histo->SetFillStyle(3001);
+
 	// histo of RMSs of the differences to get the mean deviation of the pt100 sensor
 	TH1F* diff_rms_histo = new TH1F("RMS distribution", "h_diff_rms", 21, 0., 0.2);
+	diff_rms_histo->SetLineColor(kRed);
+	diff_rms_histo->SetFillColor(kRed);
+	diff_rms_histo->SetFillStyle(3001);
+
 	// correlation between pt100 and cooli temperature
 	TGraphErrors* corr_gr = new TGraphErrors();
 	corr_gr->SetTitle("MPPC D and Cooli temperature correlation; T_{pt100} [#circC]; T_{cooli} [#circC]");
@@ -129,7 +149,7 @@ int main(int argc, char** argv){
 		printf("& %i \t& %.3f \t& %.3f \t& %.3f \t& %.3f \t& %.3f \t& %.3f \\\\ \n", iStep + 1, pt100_mean, pt100_rms, cooli_mean, cooli_rms, diff_mean, diff_rms);
 			
 		corr_gr->SetPoint(iStep, pt100_mean, cooli_mean);
-		corr_gr->SetPointError(iStep, pt100_rms, cooli_rms);
+		corr_gr->SetPointError(iStep, pt100_rms/sqrt(100.), cooli_rms/sqrt(10.));
 
 //		t_pt100->SetPoint(iStep, (float)time, pt100_mean);
 //		t_pt100->SetPointError(iStep, 0., pt100_rms);

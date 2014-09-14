@@ -444,3 +444,15 @@ footprint=my_SMD_603
 T 45350 45350 5 10 1 1 0 0 1
 value=10pF
 }
+T 50000 40700 9 10 1 0 0 0 1
+Single SiPM Controller
+T 50000 40400 9 10 1 0 0 0 1
+ssc_rev4_p2.sch
+T 50000 40100 9 10 1 0 0 0 1
+2
+T 51600 40100 9 10 1 0 0 0 1
+2
+T 53900 40400 9 10 1 0 0 0 1
+4
+T 53900 40100 9 10 1 0 0 0 1
+Weinstock, Lars Steffen

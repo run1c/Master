@@ -1,5 +1,5 @@
 
-
+#include <TROOT.h>
 #include <TFile.h>
 #include <TTree.h>
 #include <TCanvas.h>
@@ -13,12 +13,14 @@
 #define DIFF_FILE
 
 int main(int argc, char** argv){
-	const int nFiles = 3;
+	const int nFiles = 3;	// max files
 
-	if (argc != (nFiles + 1)){
+	if (argc < 2){
 		printf("Usage: ./pulse_shape_comparison <mppcd file> <mppcm file> <mppcdiff file>\n");
 		return -1;
 	}
+
+	int curFiles = argc - 1;
 
 	// 1st = old mppc_d
 	// 2nd = new mppc_min
@@ -30,6 +32,7 @@ int main(int argc, char** argv){
 	double rise_time[nFiles], fall_time[nFiles], pulse_duration[nFiles];
 	
 	// Histograms for comparison
+	
 	TH1D* h_rise[nFiles];
 	TH1D* h_fall[nFiles];
 	TH1D* h_duration[nFiles];
@@ -40,8 +43,8 @@ int main(int argc, char** argv){
 	THStack* hstack_duration = new THStack("Duration", "Pulse duration comparison;t_{p} [s]");
 
 	// setup
-	
-	for (int iFile = 0; iFile < nFiles; iFile++){
+
+	for (int iFile = 0; iFile < curFiles; iFile++){
 		// open files and get trees
 		mppc_files[iFile] = TFile::Open(argv[iFile + 1], "READ");
 		mppc_trees[iFile] = (TTree*)mppc_files[iFile]->Get("out_tree");
@@ -51,20 +54,23 @@ int main(int argc, char** argv){
 		mppc_trees[iFile]->SetBranchAddress("falltime", &fall_time[iFile]);
 		mppc_trees[iFile]->SetBranchAddress("pulseduration", &pulse_duration[iFile]);
 	
-		h_rise[iFile] = new TH1D("Risetime Histogram", "Risetime Histogram", 25, 0, 10e-9);
+		h_rise[iFile] = new TH1D("Risetime Histogram", "Risetime Histogram;t_{r} [s]", 26, 0, 10e-9);
+		h_rise[iFile]->SetFillColorAlpha( colours[iFile], 0.40 );
 		h_rise[iFile]->SetLineColor( colours[iFile] );
 		h_rise[iFile]->SetFillColor( colours[iFile] );
-		h_rise[iFile]->SetFillStyle( 3001 );
+		h_rise[iFile]->SetFillStyle(3001);
 		
-		h_fall[iFile] = new TH1D("Falltime Histogram", "Falltime Histogram", 125, 0, 50e-9); ;
+		h_fall[iFile] = new TH1D("Falltime Histogram", "Falltime Histogram;t_{f} [s]", 125, 0, 50e-9); ;
+		h_fall[iFile]->SetFillColorAlpha( colours[iFile], 0.40 );
 		h_fall[iFile]->SetLineColor( colours[iFile] );
 		h_fall[iFile]->SetFillColor( colours[iFile] );
-		h_fall[iFile]->SetFillStyle( 3001 );
+		h_fall[iFile]->SetFillStyle(3001);
 		
-		h_duration[iFile] = new TH1D("Pulse Duration Histogram", "Pulse Duration Histogram", 125, 5e-9, 55e-9);;
+		h_duration[iFile] = new TH1D("Pulse Duration Histogram", "Pulse Duration Histogram;t_{p} [s]", 125, 5e-9, 55e-9);;
+		h_duration[iFile]->SetFillColorAlpha(colours[iFile], 0.40);
 		h_duration[iFile]->SetLineColor( colours[iFile] );
 		h_duration[iFile]->SetFillColor( colours[iFile] );
-		h_duration[iFile]->SetFillStyle( 3001 );
+		h_duration[iFile]->SetFillStyle(3001);
 
 		// loop over all entries of current tree
 		nEvents = mppc_trees[iFile]->GetEntries();
@@ -82,10 +88,21 @@ int main(int argc, char** argv){
 		hstack_fall->Add(h_fall[iFile]);
 		hstack_duration->Add(h_duration[iFile]);
 	}
-
 	// save everything..
 	TFile* out_file = new TFile("comp_result.root", "RECREATE");
+
+	// since root is dumb as fuck it cannot write/read to multiple of its OWN fucking files
+	// stupid piece of shit	
 	TCanvas* c1 = new TCanvas();
+
+	for (int i = 0; i < curFiles; i++){
+		h_rise[i]->Draw();
+		c1->Write("c_rise");
+		h_fall[i]->Draw();
+		c1->Write("c_fall");
+		h_duration[i]->Draw();
+		c1->Write("c_duration");
+	}
 	
 	hstack_rise->Draw("NOSTACK");
 	c1->Write();
@@ -95,10 +112,12 @@ int main(int argc, char** argv){
 	
 	hstack_duration->Draw("NOSTACK");
 	c1->Write();
+
+	out_file->Write();
 	
 	// cleanup
 	out_file->Close();
-	for (int i = 0; i < nFiles; i++)
+	for (int i = 0; i < curFiles; i++)
 		mppc_files[i]->Close();
 
 	return 0;
