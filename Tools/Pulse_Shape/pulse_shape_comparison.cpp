@@ -5,6 +5,7 @@
 #include <TCanvas.h>
 #include <TH1D.h>
 #include <THStack.h>
+#include <TStyle.h>
 
 // just for camparison, no other use, everything is pretty static...
 
@@ -13,6 +14,17 @@
 #define DIFF_FILE
 
 int main(int argc, char** argv){
+
+	gStyle->SetLabelSize(0.04, "x");
+	gStyle->SetTitleSize(0.05, "x");
+	gStyle->SetTitleOffset(0.9, "x");
+	gStyle->SetLabelSize(0.04, "x");
+	gStyle->SetNdivisions(505, "x");
+
+	gStyle->SetLabelSize(0.04, "y");
+	gStyle->SetTitleSize(0.05, "y");
+	gStyle->SetLabelSize(0.04, "y");
+
 	const int nFiles = 3;	// max files
 
 	if (argc < 2){
@@ -36,11 +48,11 @@ int main(int argc, char** argv){
 	TH1D* h_rise[nFiles];
 	TH1D* h_fall[nFiles];
 	TH1D* h_duration[nFiles];
-	int colours[nFiles] = {kRed, kBlue, kGreen}, nEvents = 0;
+	int colours[nFiles] = {kRed, kBlue, kViolet + 2}, nEvents = 0;
 
-	THStack* hstack_rise = new THStack("Risetime", "Risetime comparison;t_{r} [s]");
-	THStack* hstack_fall = new THStack("Falltime", "Falltime comparison;t_{f} [s]");
-	THStack* hstack_duration = new THStack("Duration", "Pulse duration comparison;t_{p} [s]");
+	THStack* hstack_rise = new THStack("Risetime", "Risetime comparison;t_{r} [s];entries");
+	THStack* hstack_fall = new THStack("Falltime", "Falltime comparison;t_{f} [s];entries");
+	THStack* hstack_duration = new THStack("Duration", "Pulse duration comparison;t_{p} [s];entries");
 
 	// setup
 
@@ -54,19 +66,19 @@ int main(int argc, char** argv){
 		mppc_trees[iFile]->SetBranchAddress("falltime", &fall_time[iFile]);
 		mppc_trees[iFile]->SetBranchAddress("pulseduration", &pulse_duration[iFile]);
 	
-		h_rise[iFile] = new TH1D("Risetime Histogram", "Risetime Histogram;t_{r} [s]", 26, 0, 10e-9);
+		h_rise[iFile] = new TH1D("Risetime Histogram", "Risetime Histogram;t_{r} [s];entries", 26, 0, 10e-9);
 		h_rise[iFile]->SetFillColorAlpha( colours[iFile], 0.40 );
 		h_rise[iFile]->SetLineColor( colours[iFile] );
 		h_rise[iFile]->SetFillColor( colours[iFile] );
 		h_rise[iFile]->SetFillStyle(3001);
 		
-		h_fall[iFile] = new TH1D("Falltime Histogram", "Falltime Histogram;t_{f} [s]", 125, 0, 50e-9); ;
+		h_fall[iFile] = new TH1D("Falltime Histogram", "Falltime Histogram;t_{f} [s];entries", 125, 0, 50e-9); ;
 		h_fall[iFile]->SetFillColorAlpha( colours[iFile], 0.40 );
 		h_fall[iFile]->SetLineColor( colours[iFile] );
 		h_fall[iFile]->SetFillColor( colours[iFile] );
 		h_fall[iFile]->SetFillStyle(3001);
 		
-		h_duration[iFile] = new TH1D("Pulse Duration Histogram", "Pulse Duration Histogram;t_{p} [s]", 125, 5e-9, 55e-9);;
+		h_duration[iFile] = new TH1D("Pulse Duration Histogram", "Pulse Duration Histogram;t_{p} [s];entries", 125, 5e-9, 55e-9);;
 		h_duration[iFile]->SetFillColorAlpha(colours[iFile], 0.40);
 		h_duration[iFile]->SetLineColor( colours[iFile] );
 		h_duration[iFile]->SetFillColor( colours[iFile] );

@@ -74,7 +74,7 @@ int main(int argc, char** argv){
 #ifdef MPPC_M
 	lin_fit->SetParameters(68000, -1.6);	// if new fe board
 #endif
-	lin_fit->SetParNames("U_{0} [V]", "#DeltaU/#DeltaDAC [V/counts]");
+	lin_fit->SetParNames("U_{0} [mV]", "#DeltaU/#DeltaDAC [mV/counts]");
 
 	float volt_mean, volt_rms;
 	TGraphErrors* gr_dac_vs_volt = new TGraphErrors();

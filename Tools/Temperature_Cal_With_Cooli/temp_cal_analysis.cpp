@@ -52,18 +52,18 @@ int main(int argc, char** argv){
 
 	TFile* out_file = new TFile("out.root", "recreate");
 	// pt100 temperatures seem to be slightly smaller than set temperature
-	TH1F* pt100_histo = new TH1F("FE temperature", "FE temperature;T_{pt100} [#circC]", 100, temp_min - 3., temp_max + 1.);
+	TH1F* pt100_histo = new TH1F("FE temperature", "FE temperature;T_{pt100} [#circC]", 150, temp_min - 3., temp_max + 1.);
 	pt100_histo->SetLineColor(FE_COLOUR);
 	pt100_histo->SetFillColor(FE_COLOUR);	// FEs colour!!
 	pt100_histo->SetFillStyle(3001);
 
 	// cooli and difference between pt100 and cooli
-	TH1F* cooli_histo = new TH1F("Cooli temperature", "Cooli temperature;T_{cooli} [#circC]", 100, temp_min - 1., temp_max + 1.);
+	TH1F* cooli_histo = new TH1F("Cooli temperature", "Cooli temperature;T_{cooli} [#circC]", 150, temp_min - 1., temp_max + 1.);
 	cooli_histo->SetLineColor(COOLI_COLOUR);
 	cooli_histo->SetFillColor(COOLI_COLOUR);	// cooli colour!!
 	cooli_histo->SetFillStyle(3001);
 
-	TH1F* diff_histo = new TH1F("diff", "h_diff", 100, -5., 5.);
+	TH1F* diff_histo = new TH1F("diff", "h_diff", 30, -2., 1.);
 	diff_histo->SetLineColor(COOLI_COLOUR);
 	diff_histo->SetFillColor(COOLI_COLOUR);	// diff colour!!
 	diff_histo->SetFillStyle(3001);
@@ -112,7 +112,9 @@ int main(int argc, char** argv){
 		in_tree->GetEntry(iStep*nMeas);
 		// temperature measured by pt100 is slightly below the regulated temperature
 		pt100_histo->Reset();
+		pt100_histo->GetXaxis()->SetRangeUser(pt100_temp - 1., pt100_temp + 1.);
 		cooli_histo->Reset();
+		cooli_histo->GetXaxis()->SetRangeUser(cooli_temp - 1., cooli_temp + 1.);
 		diff_histo->Reset();
 		adc_mean = 0;
 
@@ -175,10 +177,10 @@ int main(int argc, char** argv){
 	TCanvas* c1 = new TCanvas();
 	c1->Divide(2);
 	c1->cd(1);
-	corr_gr->Fit(corr_id);
+//	corr_gr->Fit(corr_id);
 	corr_gr->Fit(corr_fit);
 	corr_gr->Draw("AP");
-	corr_id->Draw("SAME");
+//	corr_id->Draw("SAME");
 
 	// residuals
 	TGraphErrors* corr_res = new TGraphErrors();
@@ -200,8 +202,8 @@ int main(int argc, char** argv){
 		corr_id_res->SetPointError(i, corr_gr->GetErrorX(i), corr_gr->GetErrorY(i));	
 	}
 	c1->cd(2);
-	corr_id_res->Draw("A*");
-	corr_res->Draw("SAME*");
+//	corr_id_res->Draw("A*");
+	corr_res->Draw("A*");
 	line->Draw("SAME");
 
 	c1->Write();
