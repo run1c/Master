@@ -4,7 +4,7 @@
 	// EEPROM //
 	////////////
 
-#define MODULE_NO 0x15
+#define MODULE_NO 0x13
 #ifndef MODULE_NO
 /* These are default values for calibration */
 // own address
@@ -27,11 +27,11 @@ float eeDACOffB EEMEM = 0;
 float eeTGain EEMEM = 0.f;
 float eeTOff EEMEM = 0.f;
 #elif MODULE_NO == 0x10
-// state 05.08.2014
+// state 10.10.2014
 uint8_t eeAddress EEMEM = 0x10;
 uint8_t eeVcoef EEMEM = 56;
-uint32_t eeVopA EEMEM =72810;
-uint32_t eeVopB EEMEM = 72810;
+uint32_t eeVopA EEMEM =72910;
+uint32_t eeVopB EEMEM = 72835;
 char eeSerNoA[9] EEMEM  = "2K000923\0";
 char eeSerNoB[9] EEMEM  = "2K000924\0";
 float eeDACGainA EEMEM = 1.2698f;	
@@ -41,10 +41,11 @@ float eeDACOffB EEMEM = -13;
 float eeTGain EEMEM = 0.09934f;
 float eeTOff EEMEM = -45.49f;
 #elif MODULE_NO == 0x11
+// state 10.10.2014
 uint8_t eeAddress EEMEM = 0x11;
 uint8_t eeVcoef EEMEM = 56;
-uint32_t eeVopA EEMEM = 72780;
-uint32_t eeVopB EEMEM = 72780;
+uint32_t eeVopA EEMEM = 72769;
+uint32_t eeVopB EEMEM = 72889;
 char eeSerNoA[9] EEMEM  = "2K000925\0";
 char eeSerNoB[9] EEMEM  = "2K000926\0";
 float eeDACGainA EEMEM = 1.2738f;	
@@ -54,11 +55,11 @@ float eeDACOffB EEMEM = 54;
 float eeTGain EEMEM = 0.0991f;
 float eeTOff EEMEM = -45.91f;
 #elif MODULE_NO == 0x12
-// state 05.08.2014
+// state 10.10.2014
 uint8_t eeAddress EEMEM = 0x12;
 uint8_t eeVcoef EEMEM = 56;
-uint32_t eeVopA EEMEM = 72770;
-uint32_t eeVopB EEMEM = 72740;
+uint32_t eeVopA EEMEM = 72808;
+uint32_t eeVopB EEMEM = 72813;
 char eeSerNoA[9] EEMEM  = "2K000927\0";
 char eeSerNoB[9] EEMEM  = "2K000928\0";
 float eeDACGainA EEMEM = 1.2738f;	
@@ -68,11 +69,11 @@ float eeDACOffB EEMEM = 18;
 float eeTGain EEMEM = 0.10018f;
 float eeTOff EEMEM = -42.25f;
 #elif MODULE_NO == 0x13
-// state 05.08.2014
+// state 10.10.2014
 uint8_t eeAddress EEMEM = 0x13;
 uint8_t eeVcoef EEMEM = 56;
-uint32_t eeVopA EEMEM = 72710;
-uint32_t eeVopB EEMEM = 72680;
+uint32_t eeVopA EEMEM = 72815;
+uint32_t eeVopB EEMEM = 72776;
 char eeSerNoA[9] EEMEM  = "2K000929\0";
 char eeSerNoB[9] EEMEM  = "2K000930\0";
 float eeDACGainA EEMEM = 1.2787f;	
