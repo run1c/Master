@@ -24,8 +24,8 @@ float eeDACGainB EEMEM = 1.f;
 float eeDACOffA EEMEM = 0;
 float eeDACOffB EEMEM = 0;
 // pt100 temperature coefficient in degree celcius per count & offset
-float eeTGain EEMEM = 0.f;
-float eeTOff EEMEM = 0.f;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
 #elif MODULE_NO == 0x10
 // state 05.08.2014
 uint8_t eeAddress EEMEM = 0x10;
@@ -97,16 +97,30 @@ float eeTOff EEMEM = -49.14f;
 #elif MODULE_NO == 0x15
 uint8_t eeAddress EEMEM = 0x15;
 uint8_t eeVcoef EEMEM = 56;
-uint32_t eeVopA EEMEM = 70800;
-uint32_t eeVopB EEMEM = 72250;
-char eeSerNoA[9] EEMEM  = "9J000348\0";
+uint32_t eeVopB EEMEM = 70800;
+uint32_t eeVopA EEMEM = 72250;
+char eeSerNoB[9] EEMEM  = "9J000348\0";
 char eeSerNoB[9] EEMEM  = "1G000202\0";
 float eeDACGainA EEMEM = 1.27152f;	
 float eeDACGainB EEMEM = 1.2742f;
-float eeDACOffA EEMEM = 34.12;
-float eeDACOffB EEMEM = -3.;
+float eeDACOffA EEMEM = 43.;
+float eeDACOffB EEMEM = -4.;
 float eeTGain EEMEM = 0.10f;
-float eeTOff EEMEM = -50.0f;
+float eeTOff EEMEM = -45.0f;
+#elif MODULE_NO == 0x16
+// state 23.09.2014
+uint8_t eeAddress EEMEM = 0x16;
+uint8_t eeVcoef EEMEM = 56;
+uint32_t eeVopA EEMEM = 70750;
+uint32_t eeVopB EEMEM = 72370;
+char eeSerNoA[9] EEMEM  = "9J000349\0";
+char eeSerNoB[9] EEMEM  = "1G000203\0";
+float eeDACGainA EEMEM = 1.280f;	
+float eeDACGainB EEMEM = 1.271f;
+float eeDACOffA EEMEM = -181;
+float eeDACOffB EEMEM = 79;
+float eeTGain EEMEM = 0.10f;
+float eeTOff EEMEM = -50.7f;
 #elif MODULE_NO == 0x1F
 // state 30.06.2014
 uint8_t eeAddress EEMEM	= 0x1F;
@@ -472,9 +486,9 @@ float getTemperature(uint16_t temperature){
 uint16_t getVopAdjusted(int SiPM_no, float temperature){
 	// return the operation voltage in 5mV steps
 	if (SiPM_no == SIPM_A)
-		return (uint16_t)(( Vcoef*(temperature - 25.) + VopA )/5);
+		return (uint16_t)(( Vcoef*(temperature - 25.) + VopA )/5.);
 	if (SiPM_no == SIPM_B)
-		return (uint16_t)(( Vcoef*(temperature - 25.) + VopB )/5);
+		return (uint16_t)(( Vcoef*(temperature - 25.) + VopB )/5.);
 	// neither SIPM_A, nor SIPM_A = ERROR!
 	return -1;
 }
@@ -483,11 +497,11 @@ void adjustVoltages(void){
 	uint16_t adc_counts, dac_counts;
 	// read the Temperature
 	adc_counts = ADC_read(TEMP_PIN);
-	// calculate DAC value
-	dac_counts = DACOffA + 5./DACGainA * getVopAdjusted(SIPM_A, getTemperature(adc_counts));		
+	// calculate DAC value 
+	dac_counts = 5. * (getVopAdjusted(SIPM_A, getTemperature(adc_counts)) - DACOffA/5.)/DACGainA;	// VopAdj in 5mV/count, DACOffA not!!		
 	setSupplyVoltage(SIPM_A, dac_counts);
 	
-	dac_counts = DACOffB + 5./DACGainB * getVopAdjusted(SIPM_B, getTemperature(adc_counts));		
+	dac_counts = 5. * (getVopAdjusted(SIPM_B, getTemperature(adc_counts)) - DACOffB/5.)/DACGainB;		
 	setSupplyVoltage(SIPM_B, dac_counts);
 }
 

@@ -21,8 +21,8 @@
 #include <TF1.h>
 #include <TCanvas.h>
 
-#define SIPM_COM "/dev/ttyUSB1"
-#define KEITHLEY_COM "/dev/ttyUSB0"
+#define SIPM_COM "/dev/ttyUSB0"
+#define KEITHLEY_COM "/dev/ttyUSB1"
 
 using namespace std;
 
@@ -81,8 +81,8 @@ int main(int argc, char** argv){
 
 	apdpi.read_value(fe_addr, "Q");	
 	printf("[DAC Cal] - Set MPPC_D to calibration mode.\n"); 
-	if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(0);
-	if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(0);
+	if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(0.);
+	if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(0.);
 	printf("[DAC Cal] - Set DAC to 0.\n"); 
 
 	/* sourcemeter setup */
@@ -159,8 +159,8 @@ int main(int argc, char** argv){
 		 */
 
 		cur_DAC = start_DAC + DAC_per_step*iStep;
-		if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(cur_DAC*0.005);
-		if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(cur_DAC*0.005);
+		if (sipm_no == 'A') fe.set_bias_voltage_at_25_degree_A(cur_DAC*0.001);
+		if (sipm_no == 'B') fe.set_bias_voltage_at_25_degree_B(cur_DAC*0.001);
 		printf("[DAC Cal] - DAC %i\r", cur_DAC);
 
 		for (int iMeas = 0; iMeas < nMeas; iMeas++){
@@ -192,7 +192,7 @@ int main(int argc, char** argv){
 	DAC_gain_err = cal_fit->GetParError(1);
 
 	printf("[DAC Cal] - gain = (%1.5f+-%1.5f)mV/DAC count\n", DAC_gain, DAC_gain_err);
-	printf("[DAC Cal] - offset = (%4.2f+-%4.2f)DAC counts\n", DAC_offset, DAC_offset_err);
+	printf("[DAC Cal] - offset = (%4.2f+-%4.2f)mV\n", DAC_offset, DAC_offset_err);
 
 	result << "# DAC calibration 0x" << hex << fe_addr << " SiPM " << dec << sipm_no << " #" << endl;
 	result << "DAC gain\t" << DAC_gain << endl;
