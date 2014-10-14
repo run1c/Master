@@ -1,6 +1,7 @@
 #include <Adafruit_MotorShield.h>
 #include <Wire.h>
 #include "utility/Adafruit_PWMServoDriver.h"
+#include <avr/eeprom.h>
 
 // commands
 #define MOVE 	'm'
@@ -9,6 +10,7 @@
 #define GET_POS 'p'
 #define SET_POS 's'
 #define PC_INT	'i'
+#define SAVE	'w'
 
 #define CMD_DELIMITER 	':'
 #define CMD_ERROR 	'?'
@@ -33,6 +35,12 @@
 
 #define STEPPER_SPEED 	50
 #define SINGLE_STEP_DELAY 5
+
+/*
+ *	EEPROM variables to recover position
+ */
+
+uint32_t eeCurPos[2] EEMEM; 
 
 /*
  *	Stepper motor control
@@ -93,6 +101,10 @@ const int correctionSteps = 100;	// no of steps to step back after hitting a kil
 uint8_t old_int = 0x00, new_int = 0x00;	// stores status of pin change interrupts
 
 void setup() {
+	// recover positions from eeprom
+	curSteps[0] = (int)eeprom_read_dword(&eeCurPos[0]);
+	curSteps[1] = (int)eeprom_read_dword(&eeCurPos[1]);
+
 	// init motor shield
 	motor_shield.begin();
 	stepper1->setSpeed(STEPPER_SPEED);
@@ -159,7 +171,6 @@ void loop() {
 			// echo steps done
 			InttoASCII(sbuf, ibuf);
 			UART_sendString(sbuf);
-
 			UART_sendString(EOM);
 			break;
 		case HOLD:
@@ -185,6 +196,11 @@ void loop() {
 			UART_receiveString(sbuf, MAX_LENGTH);
 			UART_sendString(sbuf);
 			curSteps[nMotor] = ASCIItoInt(sbuf, MAX_LENGTH);
+			UART_sendString(EOM);
+			break;
+		case SAVE:
+			UART_sendByte(cbuf);	
+			eeprom_write_dword(&eeCurPos[nMotor], (uint32_t)curSteps[nMotor]);
 			UART_sendString(EOM);
 			break;
 		default:  // command not understood
