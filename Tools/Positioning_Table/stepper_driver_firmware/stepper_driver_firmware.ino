@@ -291,7 +291,8 @@ void UART_flush(){
 }
 
 void failed(){
-//	UART_flush();
+	// send current character buffer for debugging
+	UART_sendByte(cbuf);
 	UART_sendByte(CMD_ERROR);
 	UART_sendString(EOM);
 
