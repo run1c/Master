@@ -76,7 +76,7 @@ Adafruit_StepperMotor* stepper1 = motor_shield.getStepper(200, 1);
 Adafruit_StepperMotor* stepper2 = motor_shield.getStepper(200, 2);
 
 /*
- *	Global variables
+ *	Global variables stuff
  */
 
 Adafruit_StepperMotor* cur_stepper;	// current stepper in motion, needed for interrupts 
