@@ -10,7 +10,7 @@ ROOTGLIBS:=$(shell root-config --glibs)
 
 LIBLAB=$(HOME)/liblab/
 
-CFLAGS=-Wall $(ROOTCFLAGS) -I$(LIBLAB) 
+CFLAGS=-g -Wall $(ROOTCFLAGS) -I$(LIBLAB) 
 LDFLAGS=-L$(LIBLAB) $(ROOTGLIBS) -llab
 
 all: $(BIN) $(BIN2)

@@ -4,27 +4,41 @@
 	// EEPROM //
 	////////////
 
-#define MODULE_NO 0x13
+#define MODULE_NO 0x04
 #ifndef MODULE_NO
 /* These are default values for calibration */
 // own address
-uint8_t eeAddress EEMEM = 0xFF;
+uint8_t eeAddress EEMEM = 0x00;
 // temperature progression coefficient in mV/K
 uint8_t eeVcoef EEMEM = 0;
 // operation voltage @ 25°C in mV
 uint32_t eeVopA EEMEM = 0;
 uint32_t eeVopB EEMEM = 0;
 // 8 byte serial number of the SiPMs
-char eeSerNoA[9] EEMEM  = {'0', '0', '0', '0', '0', '0', '0', '0', '\0'};  
-char eeSerNoB[9] EEMEM  = {'0', '0', '0', '0', '0', '0', '0', '0', '\0'};  
+char eeSerNoA[9] EEMEM  = "00000000\0";  
+char eeSerNoB[9] EEMEM  = "00000000\0";  
 // mV per DAC count
-float eeDACGainA EEMEM = 1.f;	
-float eeDACGainB EEMEM = 1.f;
+float eeDACGainA EEMEM = 1.27f;	
+float eeDACGainB EEMEM = 1.27f;
 // DAC offset in mV
 float eeDACOffA EEMEM = 0;
 float eeDACOffB EEMEM = 0;
 // pt100 temperature coefficient in degree celcius per count & offset
 float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x04
+// state 06.08.2015
+uint8_t eeAddress EEMEM = 0x04;
+uint8_t eeVcoef EEMEM = 54;
+uint32_t eeVopA EEMEM = 55000;
+uint32_t eeVopB EEMEM = 55400;
+char eeSerNoA[9] EEMEM  = "00010100\0";
+char eeSerNoB[9] EEMEM  = "00010101\0";
+float eeDACGainA EEMEM = 1.2763f;	
+float eeDACGainB EEMEM = 1.2756f;
+float eeDACOffA EEMEM = 54;
+float eeDACOffB EEMEM = 128;
+float eeTGain EEMEM = 0.09934f;
 float eeTOff EEMEM = -50.f;
 #elif MODULE_NO == 0x10
 // state 10.10.2014
@@ -125,17 +139,134 @@ float eeTOff EEMEM = -50.7f;
 #elif MODULE_NO == 0x1F
 // state 30.06.2014
 uint8_t eeAddress EEMEM	= 0x1F;
-uint8_t eeVcoef EEMEM = 57;
-uint32_t eeVopA EEMEM = 67290;
-uint32_t eeVopB EEMEM = 67290;
-char eeSerNoA[9] EEMEM = "3H000004\0";
-char eeSerNoB[9] EEMEM = "3H000004\0"; 
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 54800;
+uint32_t eeVopB EEMEM = 54800;
+char eeSerNoA[9] EEMEM = "10083\0";
+char eeSerNoB[9] EEMEM = "10055\0"; 
 float eeDACGainA EEMEM = 1.27568f;
 float eeDACGainB EEMEM = 1.2858f;
 float eeDACOffA EEMEM = 45;
 float eeDACOffB EEMEM = -554;
 float eeTGain EEMEM = 0.09996f;
 float eeTOff EEMEM = -44.757;
+
+/*
+ *	Config for MPPC Ds used in the lab course
+ */
+
+#elif MODULE_NO == 0x20
+// state 22.04.2015
+uint8_t eeAddress EEMEM	= 0x20;
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 54800;
+uint32_t eeVopB EEMEM = 54800;
+char eeSerNoA[9] EEMEM = "10083\0";
+char eeSerNoB[9] EEMEM = "10052\0"; 
+float eeDACGainA EEMEM = 1.26944f;
+float eeDACGainB EEMEM = 1.27741f;
+float eeDACOffA EEMEM = -0.04 ;
+float eeDACOffB EEMEM = -78.92;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x21
+// state 22.04.2015
+uint8_t eeAddress EEMEM	= 0x21;
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 54800;
+uint32_t eeVopB EEMEM = 54800;
+char eeSerNoA[9] EEMEM = "10084\0";
+char eeSerNoB[9] EEMEM = "10053\0"; 
+float eeDACGainA EEMEM = 1.26981f;
+float eeDACGainB EEMEM = 1.27249f;
+float eeDACOffA EEMEM = 123;
+float eeDACOffB EEMEM = -35.6;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x22
+// state 22.04.2015
+uint8_t eeAddress EEMEM	= 0x22;
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 55000;
+uint32_t eeVopB EEMEM = 54600;
+char eeSerNoA[9] EEMEM = "10085\0";
+char eeSerNoB[9] EEMEM = "10054\0"; 
+float eeDACGainA EEMEM = 1.27541f;
+float eeDACGainB EEMEM = 1.27591f;
+float eeDACOffA EEMEM = -24.13;
+float eeDACOffB EEMEM = -96.85;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x23
+// state 22.04.2015
+uint8_t eeAddress EEMEM	= 0x23;
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 55200;
+uint32_t eeVopB EEMEM = 54800;
+char eeSerNoA[9] EEMEM = "10086\0";
+char eeSerNoB[9] EEMEM = "10055\0"; 
+float eeDACGainA EEMEM = 1.27238f;
+float eeDACGainB EEMEM = 1.27701f;
+float eeDACOffA EEMEM = 60.77;
+float eeDACOffB EEMEM = 5.61;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x24
+// state 22.04.2015
+uint8_t eeAddress EEMEM	= 0x24;
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 55200;
+uint32_t eeVopB EEMEM = 54800;
+char eeSerNoA[9] EEMEM = "10087\0";
+char eeSerNoB[9] EEMEM = "10056\0"; 
+float eeDACGainA EEMEM = 1.27762f;
+float eeDACGainB EEMEM = 1.27630f;
+float eeDACOffA EEMEM = 71.;
+float eeDACOffB EEMEM = -46.41;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x25
+// state 22.04.2015
+uint8_t eeAddress EEMEM	= 0x25;
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 55200;
+uint32_t eeVopB EEMEM = 54600;
+char eeSerNoA[9] EEMEM = "10088\0";
+char eeSerNoB[9] EEMEM = "10057\0"; 
+float eeDACGainA EEMEM = 1.27715f;
+float eeDACGainB EEMEM = 1.27505f;
+float eeDACOffA EEMEM = 19.96;
+float eeDACOffB EEMEM = 192.89;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x26
+// state 22.04.2015
+uint8_t eeAddress EEMEM	= 0x26;
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 55600;
+uint32_t eeVopB EEMEM = 54600;
+char eeSerNoA[9] EEMEM = "10089\0";
+char eeSerNoB[9] EEMEM = "10058\0"; 
+float eeDACGainA EEMEM = 1.28082f;
+float eeDACGainB EEMEM = 1.27766f;
+float eeDACOffA EEMEM = -31.;
+float eeDACOffB EEMEM = 7.7;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x27
+// state 22.04.2015
+uint8_t eeAddress EEMEM	= 0x27;
+uint8_t eeVcoef EEMEM = 0;
+uint32_t eeVopA EEMEM = 55000;
+uint32_t eeVopB EEMEM = 55000;
+char eeSerNoA[9] EEMEM = "10090\0";
+char eeSerNoB[9] EEMEM = "10059\0"; 
+float eeDACGainA EEMEM = 1.27338f;
+float eeDACGainB EEMEM = 1.27388f;
+float eeDACOffA EEMEM = 40;
+float eeDACOffB EEMEM = 76.76;
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
 #endif
 
 	//////////

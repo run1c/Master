@@ -16,7 +16,7 @@
 #include <TF1.h>
 #include <TGraphErrors.h>
 
-#define SIPM_COM "/dev/ttyUSB0"
+#define SIPM_COM "/dev/ttyUSB1"
 
 using namespace std;
 

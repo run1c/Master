@@ -5,13 +5,16 @@ BIN=mppc_d
 SRC=./src/
 INC=./inc/
 
+FE_ADDR=0x21
+
 all: $(BIN).elf
 
 $(BIN).o: $(BIN).c
 	avr-gcc -O2 -mmcu=$(MCU) $^ -c -I$(INC)
 
 %.o: $(SRC)%.c
-	avr-gcc -O2 -mmcu=$(MCU) $^ -c -I$(INC)
+	@echo Frontend board address $(FE_ADDR)
+	avr-gcc -O2 -mmcu=$(MCU) -DMODULE_NO=$(FE_ADDR) $^ -c -I$(INC)
 
 %.elf: $(BIN).o $(OBJ)
 	avr-gcc -O2 -mmcu=$(MCU) $^ -o $@ 

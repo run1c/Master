@@ -21,8 +21,8 @@
 #include <TF1.h>
 #include <TCanvas.h>
 
-#define SIPM_COM "/dev/ttyUSB0"
-#define KEITHLEY_COM "/dev/ttyUSB1"
+#define SIPM_COM "/dev/ttyUSB1"
+#define KEITHLEY_COM "/dev/ttyUSB0"
 
 using namespace std;
 
