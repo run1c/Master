@@ -4,7 +4,6 @@
 	// EEPROM //
 	////////////
 
-#define MODULE_NO 0x04
 #ifndef MODULE_NO
 /* These are default values for calibration */
 // own address
@@ -110,12 +109,13 @@ float eeDACOffB EEMEM = -185;
 float eeTGain EEMEM = 0.0991f;
 float eeTOff EEMEM = -49.14f;
 #elif MODULE_NO == 0x15
+// state 04.09.2015
 uint8_t eeAddress EEMEM = 0x15;
 uint8_t eeVcoef EEMEM = 56;
-uint32_t eeVopB EEMEM = 70800;
-uint32_t eeVopA EEMEM = 72250;
-char eeSerNoB[9] EEMEM  = "9J000348\0";
-char eeSerNoB[9] EEMEM  = "1G000202\0";
+uint32_t eeVopA EEMEM = 55000;
+uint32_t eeVopB EEMEM = 54800;
+char eeSerNoA[9] EEMEM  = "003050CS\0";
+char eeSerNoB[9] EEMEM  = "003025CS\0";
 float eeDACGainA EEMEM = 1.27152f;	
 float eeDACGainB EEMEM = 1.2742f;
 float eeDACOffA EEMEM = 43.;
@@ -126,10 +126,10 @@ float eeTOff EEMEM = -45.0f;
 // state 23.09.2014
 uint8_t eeAddress EEMEM = 0x16;
 uint8_t eeVcoef EEMEM = 56;
-uint32_t eeVopA EEMEM = 70750;
-uint32_t eeVopB EEMEM = 72370;
-char eeSerNoA[9] EEMEM  = "9J000349\0";
-char eeSerNoB[9] EEMEM  = "1G000203\0";
+uint32_t eeVopA EEMEM = 54800;
+uint32_t eeVopB EEMEM = 54600;
+char eeSerNoA[9] EEMEM  = "00010084\0";
+char eeSerNoB[9] EEMEM  = "00010053\0";
 float eeDACGainA EEMEM = 1.280f;	
 float eeDACGainB EEMEM = 1.271f;
 float eeDACOffA EEMEM = -181;
