@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 // root
 #include <TFile.h>
@@ -11,6 +12,7 @@
 #define ARGV_IN		1
 #define ARGV_OUT	2
 #define ARGV_COLS	3
+#define SBUF_SIZE	256
 
 using namespace std;
 
@@ -26,8 +28,13 @@ int main(int argc, char** argv){
 
 	// open input file
 	ifstream infile;
-	infile.open(argv[ARGV_IN], ifstream::in);
+	infile.open(argv[ARGV_IN], ifstream::in); 
 	
+	if ( !infile.is_open() ){
+		printf("[Spice to root] Error on opening '%s'.\n", argv[ARGV_IN]);
+		exit(1);
+	}
+
 	// create output file
 	TFile* outfile = new TFile(argv[ARGV_OUT], "RECREATE");
 	TTree* outtree = new TTree("SpiceTree", "SpiceTree");
@@ -38,22 +45,34 @@ int main(int argc, char** argv){
 		outtree->Branch(branchName.str().c_str(), &var[iCol]);
 	}
 
-	int line;
+	int line = -1;
+	char sbuf[SBUF_SIZE];
 
 	do {
-		infile >> line;	// first entry of a line is the column number; not needed
-		if (!infile.good()){ 
-			printf("Done!\n");
+		// Stop if end of file is reached	
+		if (infile.eof()){ 
+			printf("[Spice to root] Done!\n");
 			break;
 		}
+	
+		// Ignore all non-data lines
+		if ( !(infile >> line) ) {			// line does not start with a character
+			infile.clear();				// clear error bits
+			infile.getline(sbuf, SBUF_SIZE);	// read and dump complete line
+			printf("'%s'\n", sbuf);
+			continue;
+		}
+
 		printf("[Spice to root] - line %i\t", line);
 		for (int iCol = 0; iCol < nCols; iCol++){
 			infile >> var[iCol];	
 			printf("var%i = %f\t", iCol, var[iCol]);
 		}
 		printf("\n");
+
 		outtree->Fill();
-	} while ( infile.good() );
+
+	} while ( true );
 
 	outfile->Write();
 	infile.close();

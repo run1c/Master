@@ -114,8 +114,8 @@ uint8_t eeAddress EEMEM = 0x15;
 uint8_t eeVcoef EEMEM = 56;
 uint32_t eeVopA EEMEM = 55000;
 uint32_t eeVopB EEMEM = 54800;
-char eeSerNoA[9] EEMEM  = "003050CS\0";
-char eeSerNoB[9] EEMEM  = "003025CS\0";
+char eeSerNoA[9] EEMEM  = "00010085\0";
+char eeSerNoB[9] EEMEM  = "00010054\0";
 float eeDACGainA EEMEM = 1.27152f;	
 float eeDACGainB EEMEM = 1.2742f;
 float eeDACOffA EEMEM = 43.;
@@ -123,7 +123,7 @@ float eeDACOffB EEMEM = -4.;
 float eeTGain EEMEM = 0.10f;
 float eeTOff EEMEM = -45.0f;
 #elif MODULE_NO == 0x16
-// state 23.09.2014
+// state 04.09.2015
 uint8_t eeAddress EEMEM = 0x16;
 uint8_t eeVcoef EEMEM = 56;
 uint32_t eeVopA EEMEM = 54800;
