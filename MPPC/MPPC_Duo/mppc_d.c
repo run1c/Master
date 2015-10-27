@@ -39,6 +39,20 @@ float eeDACOffA EEMEM = 54;
 float eeDACOffB EEMEM = 128;
 float eeTGain EEMEM = 0.09934f;
 float eeTOff EEMEM = -50.f;
+#elif MODULE_NO == 0x07
+// state 27.10.2015
+uint8_t eeAddress EEMEM = 0x07;
+uint8_t eeVcoef EEMEM = 60;
+uint32_t eeVopA EEMEM = 55400;
+uint32_t eeVopB EEMEM = 54800;
+char eeSerNoA[9] EEMEM  = "00010093\0";
+char eeSerNoB[9] EEMEM  = "00010062\0";
+float eeDACGainA EEMEM = 1.2811f;	
+float eeDACGainB EEMEM = 1.2779f;
+float eeDACOffA EEMEM = 6;
+float eeDACOffB EEMEM = 28; 
+float eeTGain EEMEM = 0.1f;
+float eeTOff EEMEM = -50.f;
 #elif MODULE_NO == 0x10
 // state 10.10.2014
 uint8_t eeAddress EEMEM = 0x10;
