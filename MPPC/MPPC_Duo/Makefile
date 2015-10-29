@@ -5,7 +5,7 @@ BIN=mppc_d
 ## Default frontend address, has to be passed by commandline argument
 ADDR=0x10
 PROG=stk500 # avrispmkii
-PORT=/dev/ttyACM0 # usb
+PORT=/dev/cu.usbmodem1421 # usb
 
 SRC=./src/
 INC=./inc/

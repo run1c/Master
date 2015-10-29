@@ -13,7 +13,7 @@ uint8_t eeVcoef EEMEM = 0;
 // operation voltage @ 25°C in mV
 uint32_t eeVopA EEMEM = 0;
 uint32_t eeVopB EEMEM = 0;
-// 8 byte serial number of the SiPMs
+// 8 byte serial number of the SiPMs (fill up with leading 0's)
 char eeSerNoA[9] EEMEM  = "00000000\0";  
 char eeSerNoB[9] EEMEM  = "00000000\0";  
 // mV per DAC count
@@ -82,13 +82,13 @@ float eeDACOffB EEMEM = 54;
 float eeTGain EEMEM = 0.0991f;
 float eeTOff EEMEM = -45.91f;
 #elif MODULE_NO == 0x12
-// state 10.10.2014
+// state 29.10.2015
 uint8_t eeAddress EEMEM = 0x12;
-uint8_t eeVcoef EEMEM = 56;
-uint32_t eeVopA EEMEM = 72808;
-uint32_t eeVopB EEMEM = 72813;
-char eeSerNoA[9] EEMEM  = "2K000927\0";
-char eeSerNoB[9] EEMEM  = "2K000928\0";
+uint8_t eeVcoef EEMEM = 60;
+uint32_t eeVopA EEMEM = 55400;
+uint32_t eeVopB EEMEM = 54800;
+char eeSerNoA[9] EEMEM  = "00010094\0";
+char eeSerNoB[9] EEMEM  = "00010063\0";
 float eeDACGainA EEMEM = 1.2738f;	
 float eeDACGainB EEMEM = 1.2763f;
 float eeDACOffA EEMEM = -18;
