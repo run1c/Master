@@ -1625,7 +1625,7 @@ Layer(7 "outline")
 	Line[375.00mil 1610.00mil 375.00mil 720.00mil 10.00mil 40.00mil ""]
 	Line[375.00mil 720.00mil 2425.00mil 720.00mil 10.00mil 40.00mil ""]
 	Line[2425.00mil 720.00mil 2425.00mil 1610.00mil 10.00mil 40.00mil ""]
-	Line[2425.00mil 1610.00mil 375.00mil 1610.00mil 10.00mil 40.00mil ""]
+	Line[2245.00mil 975.00mil 195.00mil 975.00mil 10.00mil 40.00mil ""]
 )
 Layer(8 "spare")
 (
