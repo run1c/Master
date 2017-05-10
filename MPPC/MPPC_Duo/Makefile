@@ -4,8 +4,8 @@ OBJ=m88pa_usart.o m88pa_timer.o m88pa_adc.o m88pa_spi.o
 BIN=mppc_d
 ## Default frontend address, has to be passed by commandline argument
 ADDR=0x10
-PROG=stk500 # avrispmkii
-PORT=/dev/cu.usbmodem1421 # usb
+PROG=avrispmkii 	#alt.: stk500
+PORT=usb		#alt.: /dev/cu.usbmodem1421
 
 SRC=./src/
 INC=./inc/
@@ -23,7 +23,7 @@ $(BIN).o: $(BIN).c
 	avr-gcc -O2 -mmcu=$(MCU) -D MODULE_NO=$(ADDR) $^ -c -I$(INC)
 
 %.elf: $(BIN).o $(OBJ)
-	avr-gcc -O2 -mmcu=$(MCU) $^ -o $@ 
+	avr-gcc -O2 -mmcu=$(MCU) $^ -o $@
 	avr-objcopy -O ihex -j .text -j .data $(BIN).elf $(BIN).hex
 
 %.eep: %.elf
